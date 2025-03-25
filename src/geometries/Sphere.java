@@ -5,16 +5,12 @@ import primitives.*;
 /**
  * Sphere class represents a 3D sphere, defined by a center point and a radius.
  */
-public class Sphere extends Geometry {
+public class Sphere extends RadialGeometry {
 
     /**
      * The center of the sphere
      */
     private final Point center;
-    /**
-     * The radius of the sphere
-     */
-    private final double radius;
 
     /**
      * Constructor that initializes a sphere with a center point and a radius.
@@ -23,11 +19,8 @@ public class Sphere extends Geometry {
      * @param radius The radius of the sphere.
      */
     public Sphere(Point center, double radius) {
-        if (radius <= 0) {
-            throw new IllegalArgumentException("Radius must be positive.");
-        }
+        super(radius); // Call the constructor of RadialGeometry to initialize the radius
         this.center = center;
-        this.radius = radius;
     }
 
     /**

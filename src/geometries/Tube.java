@@ -5,16 +5,12 @@ import primitives.*;
 /**
  * Tube class represents a 3D tube, defined by a radius and a direction vector (axis).
  */
-public class Tube extends Geometry {
+public class Tube extends RadialGeometry {
 
     /**
-     * The radius of the tube
+     * The direction vector of the tube's axis.
      */
-    private final double radius;
-    /**
-     * The direction vector of the tube's axis
-     */
-    private final Vector axis;
+    protected final Vector axis;
 
     /**
      * Constructor that initializes a tube with a radius and a direction vector.
@@ -23,10 +19,7 @@ public class Tube extends Geometry {
      * @param axis   The direction vector of the tube's axis.
      */
     public Tube(double radius, Vector axis) {
-        if (radius <= 0) {
-            throw new IllegalArgumentException("Radius must be positive.");
-        }
-        this.radius = radius;
+        super(radius); // Call the constructor of RadialGeometry to initialize the radius
         this.axis = axis.normalize(); // Normalize the axis vector
     }
 

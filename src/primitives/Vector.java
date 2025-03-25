@@ -1,15 +1,24 @@
 package primitives;
 
 /**
- * This class represents a vector in 3D space, extending Point.
- * It includes vector operations like addition, scaling, dot and cross products,
- * as well as methods for calculating length and normalization.
+ * Represents a vector in 3D space, extending the Point class.
+ * This class provides a variety of vector operations, including:
+ * - Vector addition
+ * - Scalar multiplication (scaling)
+ * - Dot product (scalar product)
+ * - Cross product (vector product)
+ * - Length (magnitude) calculation
+ * - Normalization (unit vector)
+ *
+ * A Vector is represented by three coordinates in 3D space (x, y, z),
+ * and operates on those coordinates using mathematical vector operations.
+ * Note: A zero vector (0, 0, 0) is not allowed for a valid Vector.
  */
-
 public class Vector extends Point {
 
     /**
-     * Constructor to initialize the vector with three coordinates.
+     * Constructs a Vector using three coordinates (x, y, z).
+     * If the vector is a zero vector, an IllegalArgumentException is thrown.
      *
      * @param x The x-coordinate of the vector
      * @param y The y-coordinate of the vector
@@ -23,9 +32,10 @@ public class Vector extends Point {
     }
 
     /**
-     * Constructor to initialize the vector from a Double3 object.
+     * Constructs a Vector using a Double3 object that holds the vector's coordinates.
+     * If the vector is a zero vector, an IllegalArgumentException is thrown.
      *
-     * @param coordinates The coordinates of the vector
+     * @param coordinates The coordinates of the vector as a Double3 object
      */
     public Vector(Double3 coordinates) {
         super(coordinates);
@@ -35,9 +45,9 @@ public class Vector extends Point {
     }
 
     /**
-     * Adds another vector to the current vector and returns the result.
+     * Adds another vector to the current vector and returns a new vector representing the sum.
      *
-     * @param other The vector to add
+     * @param other The vector to add to the current vector
      * @return A new Vector representing the sum of the two vectors
      */
     public Vector add(Vector other) {
@@ -45,7 +55,8 @@ public class Vector extends Point {
     }
 
     /**
-     * Scales the vector by a scalar (a number) and returns the result.
+     * Scales the vector by a scalar and returns a new vector representing the scaled version.
+     * Scaling multiplies the vector by the given scalar value.
      *
      * @param scalar The scalar to multiply the vector by
      * @return A new Vector representing the scaled vector
@@ -56,12 +67,13 @@ public class Vector extends Point {
 
     /**
      * Calculates the dot product (scalar product) of the current vector and another vector.
+     * The dot product is a measure of the vectors' similarity in direction.
      *
      * @param other The other vector to calculate the dot product with
-     * @return The dot product of the two vectors
+     * @return The dot product of the two vectors as a double value
      */
     public double dotProduct(Vector other) {
-        // שימוש ב-Double3 לשם חישוב מכפלת סקלר
+        // Dot product calculation using the Double3 class
         Double3 thisCoordinates = this.coordinates;
         Double3 otherCoordinates = other.coordinates;
         return thisCoordinates.product(otherCoordinates).d1() +
@@ -69,9 +81,10 @@ public class Vector extends Point {
                 thisCoordinates.product(otherCoordinates).d3();
     }
 
-
     /**
      * Calculates the cross product (vector product) of the current vector and another vector.
+     * The cross product is a vector perpendicular to both input vectors, with a magnitude
+     * that is proportional to the area of the parallelogram spanned by the vectors.
      *
      * @param other The other vector to calculate the cross product with
      * @return A new Vector representing the cross product of the two vectors
@@ -80,6 +93,7 @@ public class Vector extends Point {
         Double3 thisCoordinates = this.coordinates;
         Double3 otherCoordinates = other.coordinates;
 
+        // Calculating the cross product components
         double x = thisCoordinates.d2() * otherCoordinates.d3() - thisCoordinates.d3() * otherCoordinates.d2();
         double y = thisCoordinates.d3() * otherCoordinates.d1() - thisCoordinates.d1() * otherCoordinates.d3();
         double z = thisCoordinates.d1() * otherCoordinates.d2() - thisCoordinates.d2() * otherCoordinates.d1();
@@ -87,9 +101,9 @@ public class Vector extends Point {
         return new Vector(new Double3(x, y, z));
     }
 
-
     /**
      * Calculates the squared length (magnitude) of the vector.
+     * The squared length is the dot product of the vector with itself.
      *
      * @return The squared length of the vector
      */
@@ -99,6 +113,7 @@ public class Vector extends Point {
 
     /**
      * Calculates the length (magnitude) of the vector.
+     * The length is the square root of the squared length.
      *
      * @return The length of the vector
      */
@@ -107,23 +122,38 @@ public class Vector extends Point {
     }
 
     /**
-     * Normalizes the vector, i.e., converts it to a unit vector in the same direction.
+     * Normalizes the vector, converting it to a unit vector in the same direction.
+     * The resulting vector will have a length of 1, but the same direction as the original vector.
+     * If the vector has a length of zero (a zero vector), an exception will be thrown.
      *
-     * @return A new Vector representing the normalized vector
+     * @return A new Vector representing the normalized (unit) vector
+     * @throws ArithmeticException If the vector is a zero vector and cannot be normalized
      */
     public Vector normalize() {
         double len = length();
         if (len == 0) {
             throw new ArithmeticException("Cannot normalize a zero vector");
         }
-        return this.scale(1 / len);
+        return this.scale(1 / len);  // Scaling the vector to make its length 1
     }
 
+    /**
+     * Returns a string representation of the vector in the format "Vector(x, y, z)".
+     *
+     * @return A string representation of the vector
+     */
     @Override
     public String toString() {
         return "Vector" + coordinates.toString();
     }
 
+    /**
+     * Compares the current vector to another object for equality.
+     * Two vectors are considered equal if they have the same coordinates.
+     *
+     * @param obj The object to compare to
+     * @return true if the object is a vector with the same coordinates, false otherwise
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -133,6 +163,11 @@ public class Vector extends Point {
         return false;
     }
 
+    /**
+     * Returns the hash code for the vector, based on its coordinates.
+     *
+     * @return The hash code of the vector
+     */
     @Override
     public int hashCode() {
         return coordinates.hashCode();

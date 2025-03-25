@@ -7,7 +7,7 @@ import primitives.Vector;
  * This class represents a plane in 3D space, defined by a point and a normal vector.
  * It can be initialized using either three points or a point and a normal vector.
  */
-public class Plane {
+public class Plane extends Geometry {
 
     /**
      * The point on the plane
@@ -64,6 +64,7 @@ public class Plane {
      *
      * @return The normal vector to the plane.
      */
+    @Override
     public Vector getNormal(Point point) {
         if (normal == null) {
             throw new UnsupportedOperationException("Normal is not calculated yet.");
