@@ -1,4 +1,6 @@
 package primitives;
+import primitives.Vector;
+
 
 /**
  * This class represents a Ray in 3D space, which is defined by an origin point and a direction vector.

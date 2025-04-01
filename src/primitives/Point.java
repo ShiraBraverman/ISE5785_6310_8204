@@ -1,5 +1,6 @@
 package primitives;
 
+
 /**
  * This class represents a point in 3D space using three coordinates (x, y, z).
  * It supports basic geometric operations such as vector addition, subtraction,
