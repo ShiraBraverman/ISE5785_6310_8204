@@ -7,12 +7,15 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit tests for Cylinder class
+ * Unit tests for {@link geometries.Cylinder} class.
+ * These tests verify the proper behavior of cylinder creation and functionality under different scenarios.
  */
 class CylinderTests {
 
     /**
-     * Test constructor for Cylinder
+     * Test constructor for Cylinder.
+     * Verifies that cylinders are created correctly with valid parameters and that
+     * appropriate exceptions are thrown for invalid parameters such as zero or negative height.
      */
     @Test
     void testConstructor() {
@@ -27,7 +30,9 @@ class CylinderTests {
     }
 
     /**
-     * Test getNormal(Point) method for Cylinder
+     * Test getNormal(Point) method for Cylinder.
+     * Verifies that the normal vectors are calculated correctly for different points on the cylinder,
+     * including points on the curved surface, bottom base, top base, and special boundary cases.
      */
     @Test
     void testGetNormal() {

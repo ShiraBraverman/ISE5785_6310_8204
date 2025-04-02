@@ -7,12 +7,15 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit tests for {@link Polygon} class.
+ * Unit tests for {@link geometries.Polygon} class.
+ * These tests verify the proper behavior of polygon creation and functionality under different scenarios.
  */
 public class PolygonTests {
 
     /**
      * Test method for Polygon constructor.
+     * Verifies that polygons are created correctly with valid parameters and that
+     * appropriate exceptions are thrown for invalid parameters.
      */
     @Test
     public void testConstructor() {
@@ -58,7 +61,9 @@ public class PolygonTests {
     }
 
     /**
-     * Test method for getNormal()
+     * Test method for getNormal().
+     * Verifies that the normal vector to the polygon is calculated correctly
+     * and is a unit vector perpendicular to the polygon's plane.
      */
     @Test
     public void testGetNormal() {

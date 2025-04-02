@@ -8,13 +8,15 @@ import primitives.Vector;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit tests for {@link Plane} class
+ * Unit tests for {@link geometries.Plane} class.
+ * These tests verify the proper behavior of plane creation and functionality under different scenarios.
  */
 class PlaneTests {
 
     /**
      * Test for constructor with three points.
-     * Ensures the normal vector is correct and has length 1.
+     * Ensures the normal vector is calculated correctly, is perpendicular to the plane,
+     * and has length 1 (is normalized).
      */
     @Test
     void testConstructorWithThreePoints() {
@@ -36,7 +38,9 @@ class PlaneTests {
     }
 
     /**
-     * Test for constructor with three collinear points - should throw an exception.
+     * Test for constructor with three collinear points.
+     * Verifies that an IllegalArgumentException is thrown when attempting to create
+     * a plane with three points that lie on the same line, as they cannot define a plane.
      */
     @Test
     void testConstructorCollinearPoints() {
@@ -49,7 +53,9 @@ class PlaneTests {
     }
 
     /**
-     * Test for constructor with duplicate points - should throw an exception.
+     * Test for constructor with duplicate points.
+     * Verifies that an IllegalArgumentException is thrown when attempting to create
+     * a plane with duplicate points, as three distinct points are required to define a plane.
      */
     @Test
     void testConstructorDuplicatePoints() {
@@ -73,11 +79,13 @@ class PlaneTests {
     }
 
     /**
-     * Test for getNormal method
+     * Test for getNormal method.
+     * Verifies that the normal vector to the plane is calculated correctly,
+     * is a unit vector, and is oriented in the expected direction.
      */
     @Test
     void testGetNormal() {
-        // יצירת מישור על ידי שלוש נקודות
+        // Create a plane using three points
         Point p1 = new Point(0, 0, 0);
         Point p2 = new Point(1, 0, 0);
         Point p3 = new Point(0, 1, 0);
@@ -85,10 +93,10 @@ class PlaneTests {
         Plane plane = new Plane(p1, p2, p3);
         Vector normal = plane.getNormal(p1);
 
-        // בדוק שהנורמל הוא וקטור יחידה
+        // Check that the normal is a unit vector
         assertEquals(1, normal.length(), 1e-10, "Normal vector is not normalized");
 
-        // בדוק אם הנורמל מכוון נכון
+        // Check if the normal is oriented correctly
         assertEquals(new Vector(0, 0, 1), normal, "Normal vector is incorrect");
     }
 }
