@@ -22,7 +22,7 @@ public class Cylinder extends Tube {
      * @param axis   The direction vector of the cylinder's axis (must be normalized).
      * @throws IllegalArgumentException If the height is less than or equal to 0.
      */
-    public Cylinder(double radius, double height, Vector axis) {
+    public Cylinder(double radius, double height, Ray axis) {
         super(radius, axis);  // Call the constructor of Tube to initialize radius and axis
         if (height <= 0) {
             throw new IllegalArgumentException("Height must be positive.");
@@ -42,21 +42,32 @@ public class Cylinder extends Tube {
      */
     @Override
     public Vector getNormal(Point point) {
-        Vector centerToPoint = point.subtract(new Point(0, 0, 0));  // Vector from the center to the point on the surface
-        double projectionLength = centerToPoint.dotProduct(axis);  // Projection of the vector onto the axis
+        Vector axisDir = axisRay.getDirection();
+        Point axisOrigin = axisRay.getOrigin();
+        Vector centerToPoint = point.subtract(axisOrigin);
+        double projectionLength = centerToPoint.dotProduct(axisDir);
 
         // Handle the base case (point is on the bottom base of the cylinder)
         if (projectionLength <= 0) {
-            return axis.scale(-1.0);  // Normal points downward from the base
+            // אם הנקודה היא בדיוק במרכז הבסיס, נחזיר את הנורמל בכיוון הפוך
+            if (point.equals(axisOrigin)) {
+                return axisDir.scale(-1.0);  // Normal points downward from the base
+            }
+            return axisDir.scale(-1.0);  // Normal points downward from the base
         }
 
-        // Handle the top base case (point is on the top base of the cylinder)
+        // Handle the top base case (point is on the top base)
         if (projectionLength >= height) {
-            return axis;  // Normal points upward from the top base
+            // אם הנקודה היא במרכז הבסיס העליון, נחזיר את הנורמל
+            Point topBaseCenter = axisOrigin.add(axisDir.scale(height));
+            if (point.equals(topBaseCenter)) {
+                return axisDir;  // Normal points upward from the top base
+            }
+            return axisDir;  // Normal points upward from the top base
         }
 
         // Handle the side of the cylinder (point is on the lateral surface)
-        Point projectionPoint = new Point(0, 0, 0).add(axis.scale(projectionLength));  // Calculate the projected point on the axis
+        Point projectionPoint = axisOrigin.add(axisDir.scale(projectionLength));  // Calculate the projected point on the axis
         return point.subtract(projectionPoint).normalize();  // Return the normalized vector from the projected point to the given point
     }
 }

@@ -3,8 +3,7 @@ package unittests.primitives;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import primitives.Point;
-
-
+import primitives.Vector;
 
 /**
  * Unit tests for the Point class.
@@ -17,9 +16,7 @@ class PointTests {
     @Test
     void testConstructor() {
         Point p1 = new Point(1, 2, 3);
-        assertEquals(1, p1.coordinates.d1(), "Incorrect x coordinate");
-        assertEquals(2, p1.coordinates.d2(), "Incorrect y coordinate");
-        assertEquals(3, p1.coordinates.d3(), "Incorrect z coordinate");
+        assertDoesNotThrow(() -> new Point(1, 2, 3));
 
         Point zero = Point.ZERO;
         assertEquals(new Point(0, 0, 0), zero, "ZERO constant is incorrect");

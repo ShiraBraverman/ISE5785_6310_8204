@@ -1,0 +1,11 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\src",
+    "\\src\\test",
+    "\\src\\unittests",
+    "\\src\\unittests\\geometries"
+  ],
+  "SelectedNode": "\\src\\unittests\\geometries\\RadialGeometryTests.java",
+  "PreviewInSolutionExplorer": false
+}

@@ -31,8 +31,8 @@ class VectorTests {
     void testScale() {
         Vector v = new Vector(1, -2, 3);
 
-        assertEquals(new Vector(2, -4, 6), v.scale(2), "Scale function failed");
-        assertThrows(IllegalArgumentException.class, () -> v.scale(0), "Scaling by zero should throw exception");
+        assertEquals(new Vector(2, -4, 6), v.scale(2.0), "Scale function failed");
+        assertThrows(IllegalArgumentException.class, () -> v.scale(0.0), "Scaling by zero should throw exception");
     }
 
     /**
@@ -59,7 +59,7 @@ class VectorTests {
         Vector cross = v1.crossProduct(v2);
         assertEquals(0, cross.dotProduct(v1), "Cross product should be orthogonal to the first operand");
         assertEquals(0, cross.dotProduct(v2), "Cross product should be orthogonal to the second operand");
-        assertThrows(IllegalArgumentException.class, () -> v1.crossProduct(v1.scale(2)), "Parallel vectors should throw exception");
+        assertThrows(IllegalArgumentException.class, () -> v1.crossProduct(v1.scale(2.0)), "Parallel vectors should throw exception");
     }
 
     /**

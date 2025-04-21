@@ -27,7 +27,7 @@ public class Vector extends Point {
     public Vector(double x, double y, double z) {
         super(x, y, z);
         if (coordinates.equals(Double3.ZERO)) {
-            throw new IllegalArgumentException("Zero vector is not allowed");
+            throw new ArithmeticException("Zero vector is not allowed");
         }
     }
 
