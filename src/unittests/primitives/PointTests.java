@@ -44,7 +44,10 @@ class PointTests {
         Point p = new Point(1, 1, 1);
         Vector v = new Vector(2, 2, 2);
         Point result = p.add(v);
-        assertEquals(new Point(3, 3, 3), result, "Point addition with vector is incorrect");
+        assertEquals(
+                new Point(3, 3, 3),
+                result,
+                "Point addition with vector is incorrect");
     }
 
     /**

@@ -11,6 +11,8 @@ import primitives.Vector;
  */
 class VectorTests {
 
+    public static final double DELTA = 1e-10;
+
     /**
      * Test method for {@link Vector#add(Vector)}.
      */
@@ -87,7 +89,7 @@ class VectorTests {
     void testNormalize() {
         Vector v = new Vector(0, 3, 4);
         Vector normalized = v.normalize();
-        assertEquals(1, normalized.length(), 1e-10, "Normalized vector should have length 1");
+        assertEquals(1, normalized.length(), DELTA, "Normalized vector should have length 1");
         assertThrows(ArithmeticException.class, () -> new Vector(0, 0, 0).normalize(), "Normalizing zero vector should throw exception");
     }
 }

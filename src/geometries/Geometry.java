@@ -1,7 +1,10 @@
 package geometries;
 
-import primitives.Point;
 import primitives.Vector;
+import primitives.Point;
+import primitives.Ray;
+
+import java.util.List;
 
 /**
  * This abstract class represents a generic geometry object in a 3D space.
@@ -11,7 +14,8 @@ import primitives.Vector;
  * Each concrete geometry object must implement the method to return the normal vector
  * at a specified point on its surface.
  */
-public abstract class Geometry {
+public abstract class Geometry implements Intersectable {
+
     /**
      * Default constructor for Geometry.
      */
@@ -26,7 +30,20 @@ public abstract class Geometry {
      *
      * @param point The point on the surface of the geometry where the normal vector is to be calculated.
      * @return The normal vector to the surface of the geometry at the given point.
-     *         The vector is typically normalized (unit vector) but this depends on the specific geometry.
+     * The vector is typically normalized (unit vector) but this depends on the specific geometry.
      */
     public abstract Vector getNormal(Point point);
+
+    /**
+     * This method is part of the Intersectable interface.
+     * For now, it will be implemented as an empty method,
+     * and it will be overridden by subclasses such as Sphere, Plane, etc.
+     *
+     * @param ray The ray to check for intersections.
+     * @return null (to be implemented by subclasses)
+     */
+    @Override
+    public List<Point> findIntersections(Ray ray) {
+        return null;
+    }
 }

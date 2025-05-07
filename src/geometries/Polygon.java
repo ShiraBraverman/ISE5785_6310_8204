@@ -10,11 +10,17 @@ import primitives.*;
  * The polygon is defined by a list of ordered vertices and must be convex.
  */
 public class Polygon extends Geometry {
-   /** List of polygon's vertices */
+   /**
+    * List of polygon's vertices
+    */
    protected final List<Point> vertices;
-   /** Associated plane in which the polygon lies */
+   /**
+    * Associated plane in which the polygon lies
+    */
    protected final Plane plane;
-   /** The number of vertices in the polygon */
+   /**
+    * The number of vertices in the polygon
+    */
    private final int size;
 
    /**
@@ -73,5 +79,68 @@ public class Polygon extends Geometry {
    @Override
    public Vector getNormal(Point point) {
       return plane.getNormal(point);
+   }
+
+   /**
+    * This method returns the list of intersection points between a given ray and the polygon.
+    *
+    * @param ray The ray to check for intersections.
+    * @return A list of points where the ray intersects the polygon, or null if there are no intersections.
+    */
+   @Override
+   public List<Point> findIntersections(Ray ray) {
+      // Step 1: Check intersection with the plane of the polygon
+      List<Point> intersections = plane.findIntersections(ray);
+      if (intersections == null || intersections.isEmpty()) {
+         return null; // If no intersection with the plane, return null (no intersection with the polygon)
+      }
+
+      // Step 2: Check if the intersection point is inside the polygon
+      Point intersectionPoint = intersections.get(0); // We know there's only one point on the plane
+      if (isPointInPolygon(intersectionPoint)) {
+         return List.of(intersectionPoint); // If the point is inside the polygon, return it
+      }
+
+      return null; // If the point is not inside the polygon, no intersection
+   }
+
+   /**
+    * This helper method checks if a point is inside the polygon.
+    * The method uses the ray-casting algorithm to check if the point is inside the polygon.
+    *
+    * @param point The point to check.
+    * @return true if the point is inside the polygon, false otherwise.
+    */
+   protected boolean isPointInPolygon(Point point) {
+      int intersectionsCount = 0;
+      Ray ray = new Ray(point, new Vector(1, 0, 0)); // A ray in any direction (here along the x-axis)
+
+      // Loop through each edge of the polygon to check for intersections
+      for (int i = 0; i < size; i++) {
+         Point p1 = vertices.get(i);
+         Point p2 = vertices.get((i + 1) % size);
+
+         // Check if the ray intersects with the edge of the polygon
+         if (doIntersect(ray, p1, p2)) {
+            intersectionsCount++;
+         }
+      }
+
+      // If the number of intersections is odd, the point is inside the polygon
+      return intersectionsCount % 2 != 0;
+   }
+
+   /**
+    * This method checks if the ray intersects with the edge of the polygon.
+    *
+    * @param ray The ray to check for intersection.
+    * @param p1  The first point of the edge.
+    * @param p2  The second point of the edge.
+    * @return true if the ray intersects with the edge, false otherwise.
+    */
+   private boolean doIntersect(Ray ray, Point p1, Point p2) {
+      // Here you need to implement the logic for intersection between the ray and the edge of the polygon.
+      // This is just a placeholder, and you would need to implement the actual intersection logic.
+      return false; // Placeholder, implement the actual intersection check
    }
 }

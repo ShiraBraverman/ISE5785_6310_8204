@@ -87,4 +87,14 @@ public class Ray {
     public int hashCode() {
         return origin.hashCode() + 31 * direction.hashCode();  // Standard way of combining hash codes.
     }
+
+    /**
+     * Returns a point on the ray at a given parameter t.
+     *
+     * @param t The parameter along the ray (where t = 0 is the origin, and positive t values are along the direction).
+     * @return The point on the ray corresponding to the parameter t.
+     */
+    public Point getPoint(double t) {
+        return origin.add(direction.scale(t));
+    }
 }

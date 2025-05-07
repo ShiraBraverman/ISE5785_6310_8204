@@ -2,6 +2,11 @@ package geometries;
 
 import primitives.Point;
 import primitives.Vector;
+import primitives.Ray;
+
+import java.util.List;
+
+import static primitives.Util.isZero;
 
 /**
  * This class represents a plane in 3D space, defined by a point and a normal vector.
@@ -35,11 +40,15 @@ public class Plane extends Geometry {
         // The normal vector is the cross product of the two vectors
         Vector normalUnnormalized = v1.crossProduct(v2);
 
+        if (normalUnnormalized.length() == 0) {
+            throw new IllegalArgumentException("The three points are collinear and cannot define a plane.");
+        }
+
         // Store the point as the reference point for the plane
         this.point = p1;
 
         // The normal is not normalized yet, so we leave it as is
-        this.normal = normalUnnormalized; // Store the calculated normal
+        this.normal = normalUnnormalized.normalize(); // Store the calculated normal
     }
 
     /**
@@ -53,6 +62,7 @@ public class Plane extends Geometry {
         if (normal.equals(new Vector(0, 0, 0))) {
             throw new IllegalArgumentException("Normal vector cannot be a zero vector");
         }
+
         this.point = point;
         // Normalize the normal vector before storing it
         this.normal = normal.normalize();
@@ -80,4 +90,40 @@ public class Plane extends Geometry {
     public Point getPoint() {
         return point;
     }
+
+    /**
+     * Finds the intersection points of the plane with a given ray.
+     *
+     * @param ray The ray to check for intersections.
+     * @return A list of points where the ray intersects the plane, or null if no intersection.
+     */
+    @Override
+    public List<Point> findIntersections(Ray ray) {
+        Vector normal = this.normal;
+        Point rayOrigin = ray.getOrigin();
+        Vector rayDirection = ray.getDirection();
+
+        double denom = normal.dotProduct(rayDirection);
+        System.out.println("denom = " + denom + " (isZero = " + isZero(denom) + ")");
+
+        if (isZero(denom)) {
+            System.out.println("Ray is parallel to the plane.");
+            return null;
+        }
+
+        double num = normal.dotProduct(this.point.subtract(rayOrigin));
+        System.out.println("num = " + num);
+
+        double t = num / denom;
+        System.out.println("t = " + t);
+
+        if (t >= 0 && num * denom > 0) {
+            Point intersection = ray.getPoint(t);
+            return List.of(intersection);  // Return the intersection point as a list
+        }
+
+        System.out.println("Intersection is behind the ray's origin.");
+        return null;
+    }
+
 }

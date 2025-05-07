@@ -2,6 +2,9 @@ package geometries;
 
 import primitives.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Tube class represents a 3D tube, defined by a radius and a central axis (Ray).
  */
@@ -57,5 +60,54 @@ public class Tube extends RadialGeometry {
      */
     public Ray getAxisRay() {
         return axisRay;
+    }
+
+    /**
+     * Finds the intersections between the tube and a given ray.
+     * The intersections are calculated by solving the quadratic equation
+     * that arises from the ray's parametric equation and the tube's equation.
+     *
+     * @param ray The ray to check for intersections.
+     * @return A list of intersection points, or null if there are no intersections.
+     */
+    public List<Point> findIntersections(Ray ray) {
+        // Define the vector from the tube's axis to the ray's origin
+        Vector axisDirection = axisRay.getDirection();
+        Point rayOrigin = ray.getOrigin();
+        Vector rayDirection = ray.getDirection();
+        Point tubeOrigin = axisRay.getOrigin();
+        Vector axisToRay = rayOrigin.subtract(tubeOrigin);
+
+        // Perpendicular vector between the ray and the tube axis
+        Vector axisToRayPerpendicular = axisToRay.subtract(axisDirection.scale(axisToRay.dotProduct(axisDirection) / axisDirection.lengthSquared()));
+
+        // Define the quadratic equation terms
+        double a = rayDirection.subtract(axisDirection.scale(rayDirection.dotProduct(axisDirection) / axisDirection.lengthSquared())).lengthSquared();
+        double b = 2 * rayDirection.subtract(axisDirection.scale(rayDirection.dotProduct(axisDirection) / axisDirection.lengthSquared())).dotProduct(axisToRayPerpendicular);
+        double c = axisToRayPerpendicular.lengthSquared() - radius * radius;
+
+        // Compute the discriminant
+        double discriminant = b * b - 4 * a * c;
+
+        // If the discriminant is negative, there are no intersections
+        if (discriminant < 0) {
+            return null;
+        }
+
+        // Calculate the intersection points using the quadratic formula
+        double t1 = (-b + Math.sqrt(discriminant)) / (2 * a);
+        double t2 = (-b - Math.sqrt(discriminant)) / (2 * a);
+
+        List<Point> intersections = new ArrayList<>();
+
+        // If t1 and t2 are valid (positive and within range), add the points
+        if (t1 > 0) {
+            intersections.add(ray.getPoint(t1));
+        }
+        if (t2 > 0) {
+            intersections.add(ray.getPoint(t2));
+        }
+
+        return intersections;
     }
 }

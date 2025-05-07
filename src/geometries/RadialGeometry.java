@@ -2,6 +2,8 @@ package geometries;
 
 import primitives.*;
 
+import java.util.List;
+
 /**
  * This abstract class represents a radial geometry, i.e., a geometry that has a radius.
  * It implements the Geometry interface and includes a radius field.
@@ -34,4 +36,14 @@ public abstract class RadialGeometry extends Geometry {
     public double getRadius() {
         return radius;
     }
+
+    /**
+     * Finds the intersection points of the geometry with a given ray.
+     * This method needs to be implemented in the specific subclasses (e.g., Sphere, Cylinder).
+     *
+     * @param ray The ray to check for intersections.
+     * @return A list of points where the ray intersects the geometry, or null if no intersection.
+     */
+    @Override
+    public abstract List<Point> findIntersections(Ray ray);
 }
