@@ -74,4 +74,5 @@ public class Polygon extends Geometry {
    public Vector getNormal(Point point) {
       return plane.getNormal(point);
    }
+
 }

@@ -11,7 +11,8 @@ import primitives.Vector;
  * Each concrete geometry object must implement the method to return the normal vector
  * at a specified point on its surface.
  */
-public abstract class Geometry {
+public abstract class Geometry implements Intersectable {
+
     /**
      * Default constructor for Geometry.
      */

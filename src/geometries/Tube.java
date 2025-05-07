@@ -2,6 +2,8 @@ package geometries;
 
 import primitives.*;
 
+import java.util.List;
+
 /**
  * Tube class represents a 3D tube, defined by a radius and a central axis (Ray).
  */
@@ -58,4 +60,6 @@ public class Tube extends RadialGeometry {
     public Ray getAxisRay() {
         return axisRay;
     }
+
+
 }

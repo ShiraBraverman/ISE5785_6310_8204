@@ -2,6 +2,8 @@ package geometries;
 
 import primitives.*;
 
+import java.util.List;
+
 /**
  * Sphere class represents a 3D sphere, defined by a center point and a radius.
  */
@@ -36,4 +38,5 @@ public class Sphere extends RadialGeometry {
         // The normal to the sphere is the vector from the center to the point, normalized
         return point.subtract(center).normalize();
     }
+
 }
