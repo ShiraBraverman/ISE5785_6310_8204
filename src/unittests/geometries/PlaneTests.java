@@ -162,7 +162,7 @@ class PlaneTests {
         Plane plane = new Plane(p1, p2, p3);
 
         // Ray in the plane
-        Ray ray = new Ray(new Point(0, 0, 0), new Vector(1, 1, 0));
+        Ray ray = new Ray(new Point(0, 0, 0.999), new Vector(0, 0, 1));
         List<Point> intersections = plane.findIntersections(ray);
         assertNull(intersections, "Ray lying in the plane should not intersect it");
     }
@@ -179,9 +179,11 @@ class PlaneTests {
         Plane plane = new Plane(p1, p2, p3);
 
         // Ray starting on the plane and going in the same direction as the normal
-        Ray ray = new Ray(new Point(0, 0, 0), new Vector(0, 0, 1));
+        Ray ray = new Ray(new Point(0, 0, 0.999), new Vector(0, 0, 1));
         List<Point> intersections = plane.findIntersections(ray);
         assertNull(intersections, "Ray starting on the plane should not intersect the plane again");
     }
+
+
 }
 

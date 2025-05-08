@@ -5,6 +5,8 @@ import primitives.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static primitives.Util.isZero;
+
 /**
  * Tube class represents a 3D tube, defined by a radius and a central axis (Ray).
  */
@@ -70,44 +72,57 @@ public class Tube extends RadialGeometry {
      * @param ray The ray to check for intersections.
      * @return A list of intersection points, or null if there are no intersections.
      */
+    @Override
     public List<Point> findIntersections(Ray ray) {
-        // Define the vector from the tube's axis to the ray's origin
-        Vector axisDirection = axisRay.getDirection();
-        Point rayOrigin = ray.getOrigin();
-        Vector rayDirection = ray.getDirection();
-        Point tubeOrigin = axisRay.getOrigin();
-        Vector axisToRay = rayOrigin.subtract(tubeOrigin);
-
-        // Perpendicular vector between the ray and the tube axis
-        Vector axisToRayPerpendicular = axisToRay.subtract(axisDirection.scale(axisToRay.dotProduct(axisDirection) / axisDirection.lengthSquared()));
-
-        // Define the quadratic equation terms
-        double a = rayDirection.subtract(axisDirection.scale(rayDirection.dotProduct(axisDirection) / axisDirection.lengthSquared())).lengthSquared();
-        double b = 2 * rayDirection.subtract(axisDirection.scale(rayDirection.dotProduct(axisDirection) / axisDirection.lengthSquared())).dotProduct(axisToRayPerpendicular);
-        double c = axisToRayPerpendicular.lengthSquared() - radius * radius;
-
-        // Compute the discriminant
-        double discriminant = b * b - 4 * a * c;
-
-        // If the discriminant is negative, there are no intersections
-        if (discriminant < 0) {
-            return null;
-        }
-
-        // Calculate the intersection points using the quadratic formula
-        double t1 = (-b + Math.sqrt(discriminant)) / (2 * a);
-        double t2 = (-b - Math.sqrt(discriminant)) / (2 * a);
-
-        List<Point> intersections = new ArrayList<>();
-
-        // If t1 and t2 are valid (positive and within range), add the points
-        if (t1 > 0) {
-            intersections.add(ray.getPoint(t1));
-        }
-        if (t2 > 0) {
-            intersections.add(ray.getPoint(t2));
-        }
-
-        return intersections;
+        return null;
+//        Vector vAxis = axisRay.getDirection(); // כיוון הציר
+//        Point p0 = ray.getOrigin(); // נקודת ההתחלה של הקרן
+//        Vector v = ray.getDirection(); // כיוון הקרן
+//        Point pa = axisRay.getOrigin(); // נקודת ההתחלה של הצינור
+//
+//        Vector deltaP;
+//        try {
+//            deltaP = p0.subtract(pa); // חישוב וקטור ההפרש בין נקודת ההתחלה של הקרן ונקודת ההתחלה של הצינור
+//        } catch (IllegalArgumentException e) {
+//            deltaP = new Vector(0, 0, 0); // אם נקודת ההתחלה של הקרן שווה לזו של הצינור
+//        }
+//
+//        double vVa = v.dotProduct(vAxis); // חישוב v * va
+//        Vector vMinusVa = v;
+//        if (!isZero(vVa)) {
+//            vMinusVa = v.subtract(vAxis.scale(vVa)); // v - v*va*va
+//        }
+//
+//        double deltaPVa = deltaP.dotProduct(vAxis); // חישוב deltaP * va
+//        Vector deltaPMinusVa = deltaP;
+//        if (!isZero(deltaPVa)) {
+//            deltaPMinusVa = deltaP.subtract(vAxis.scale(deltaPVa)); // deltaP - deltaP*va*va
+//        }
+//
+//        double A = vMinusVa.lengthSquared(); // A = (v - v*va*va)^2
+//        double B = 2 * vMinusVa.dotProduct(deltaPMinusVa); // B = 2 * (v - v*va*va) * (deltaP - deltaP*va*va)
+//        double C = deltaPMinusVa.lengthSquared() - radius * radius; // C = (deltaP - deltaP*va*va)^2 - R^2
+//
+//        double discriminant = B * B - 4 * A * C; // חישוב הדיסקרימיננטה
+//        if (discriminant < 0) {
+//            return null; // אם אין חיתוכים
+//        }
+//
+//        double sqrtDiscriminant = Math.sqrt(discriminant); // חישוב שורש הדיסקרימיננטה
+//        double t1 = (-B + sqrtDiscriminant) / (2 * A); // חישוב t1
+//        double t2 = (-B - sqrtDiscriminant) / (2 * A); // חישוב t2
+//
+//        List<Point> intersections = new ArrayList<>();
+//        if (t1 >= 0) intersections.add(ray.getPoint(t1)); // אם t1 חיובי, הוסף את הנקודה
+//        if (t2 >= 0 && !isZero(t1 - t2)) intersections.add(ray.getPoint(t2)); // אם t2 חיובי ושונה מ-t1, הוסף את הנקודה
+//
+//        return intersections.isEmpty() ? null : intersections; // החזר אם יש חיתוכים, אחרת null
     }
+
+
+
+
+
+
+
 }

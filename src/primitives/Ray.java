@@ -97,4 +97,7 @@ public class Ray {
     public Point getPoint(double t) {
         return origin.add(direction.scale(t));
     }
+    public Point getHead() {
+        return origin;
+    }
 }

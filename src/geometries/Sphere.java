@@ -4,6 +4,8 @@ import primitives.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import static primitives.Util.alignZero;
+
 
 /**
  * Sphere class represents a 3D sphere, defined by a center point and a radius.
@@ -48,37 +50,37 @@ public class Sphere extends RadialGeometry {
      */
     @Override
     public List<Point> findIntersections(Ray ray) {
+        Vector v = ray.getDirection();
+        Point p0 = ray.getOrigin();
+
+        // אם הקרן מתחילה במרכז הכדור
+        if (p0.equals(center)) {
+            return List.of(p0.add(v.scale(radius)));
+        }
+        Vector u = center.subtract(p0);
+        double tm = alignZero(v.dotProduct(u));
+        double d2 = alignZero(u.lengthSquared() - tm * tm);
+
+        if (alignZero(d2 - radius * radius) > 0) {
+            return List.of(); // רשימה ריקה במקרה שאין חיתוך
+        }
+
+        double th = alignZero(Math.sqrt(radius * radius - d2));
+        double t1 = alignZero(tm - th);
+        double t2 = alignZero(tm + th);
+
         List<Point> intersections = new ArrayList<>();
 
-        // The vector from the ray's origin to the sphere's center
-        Vector L = center.subtract(ray.getOrigin());
-
-        // The projection of L onto the ray's direction
-        double tca = L.dotProduct(ray.getDirection());
-
-        // Calculate the distance from the center to the ray's path
-        double d2 = L.lengthSquared() - tca * tca;
-
-        // If the ray does not intersect the sphere, return an empty list
-        if (d2 > radius * radius) {
-            return intersections;
-        }
-
-        // Calculate the distance from the projection to the intersection point(s)
-        double thc = Math.sqrt(radius * radius - d2);
-
-        // Calculate the two intersection points
-        double t0 = tca - thc;
-        double t1 = tca + thc;
-
-        // If t0 or t1 is positive, the ray intersects the sphere
-        if (t0 > 0) {
-            intersections.add(ray.getPoint(t0));
-        }
+        // אם t1 ו t2 הם תקפים (חיוביים ומצויים בטווח), הוסף את הנקודות
         if (t1 > 0) {
             intersections.add(ray.getPoint(t1));
         }
+        if (t2 > 0) {
+            intersections.add(ray.getPoint(t2));
+        }
 
-        return intersections;
+        return intersections.isEmpty() ? null : intersections;  // אם לא נמצאו חיתוכים, תחזור על null
     }
+
+
 }

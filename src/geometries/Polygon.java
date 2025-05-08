@@ -112,22 +112,31 @@ public class Polygon extends Geometry {
     * @return true if the point is inside the polygon, false otherwise.
     */
    protected boolean isPointInPolygon(Point point) {
-      int intersectionsCount = 0;
-      Ray ray = new Ray(point, new Vector(1, 0, 0)); // A ray in any direction (here along the x-axis)
+// Retrieve the normal vector of the plane
+      Vector n = plane.getNormal(vertices.get(0));
 
-      // Loop through each edge of the polygon to check for intersections
-      for (int i = 0; i < size; i++) {
-         Point p1 = vertices.get(i);
-         Point p2 = vertices.get((i + 1) % size);
+      Vector v1 = vertices.get(vertices.size() - 1).subtract(point); // מהנקודה לאחרון
+      Vector v2 = vertices.get(0).subtract(point); // מהנקודה לראשון
+      Vector cross = v1.crossProduct(v2);
+      double sign = alignZero(n.dotProduct(cross)); // סמן ראשוני
 
-         // Check if the ray intersects with the edge of the polygon
-         if (doIntersect(ray, p1, p2)) {
-            intersectionsCount++;
-         }
+      if (isZero(sign)) return false; // אם המכפלה הסקלרית אפס - הנקודה על קו, לא בתוך מצולע
+
+      boolean positive = sign > 0;
+
+      for (int i = 1; i < vertices.size(); ++i) {
+         v1 = v2;
+         v2 = vertices.get(i).subtract(point);
+         cross = v1.crossProduct(v2);
+         sign = alignZero(n.dotProduct(cross));
+
+         if (isZero(sign)) return false; // אם בדיוק על הקו – לא בתוך
+
+         if ((sign > 0) != positive)
+            return false; // אם כיוון המכפלה השתנה – הנקודה מחוץ לפוליגון
       }
 
-      // If the number of intersections is odd, the point is inside the polygon
-      return intersectionsCount % 2 != 0;
+      return true;
    }
 
    /**

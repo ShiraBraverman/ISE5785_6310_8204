@@ -5,6 +5,10 @@ import primitives.Point;
 import primitives.Vector;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+import java.util.List;
+import primitives.Ray;
+
+
 
 /**
  * Unit tests for {@link geometries.Polygon} class.
@@ -83,4 +87,55 @@ public class PolygonTests {
         assertTrue(normal.equals(new Vector(0, 0, 1)) || normal.equals(new Vector(0, 0, -1)),
                 "Polygon normal is incorrect");
     }
+    @Test
+    public void testFindIntersections() {
+        Polygon triangle = new Polygon(
+                new Point(0, 0, 0),
+                new Point(1, 0, 0),
+                new Point(0, 1, 0)
+        );
+
+        // TC01: Ray intersects inside the triangle
+        Point expectedPoint = new Point(0.25, 0.25, 0);
+        assertEquals(
+                List.of(expectedPoint),
+                triangle.findIntersections(
+                        new Ray(new Point(0.25, 0.25, 1), new Vector(0, 0, -1))
+                ),
+                "Ray should intersect inside the triangle"
+        );
+
+        // TC02: Ray misses the triangle
+        assertNull(
+                triangle.findIntersections(
+                        new Ray(new Point(2, 2, 1), new Vector(0, 0, -1))
+                ),
+                "Ray should miss the triangle"
+        );
+
+        // TC03: Ray lies in the plane but outside the triangle
+        assertNull(
+                triangle.findIntersections(
+                        new Ray(new Point(1.5, 0.5, 0), new Vector(1, 0, 0))
+                ),
+                "Ray lies in the plane but does not intersect the triangle"
+        );
+
+        // TC04: Ray is parallel and above the triangle
+        assertNull(
+                triangle.findIntersections(
+                        new Ray(new Point(0.5, 0.5, 1), new Vector(1, 0, 0))
+                ),
+                "Ray is parallel to the triangle and should not intersect"
+        );
+
+        // TC05: Ray intersects the plane outside the triangle
+        assertNull(
+                triangle.findIntersections(
+                        new Ray(new Point(1.5, 0.5, 1), new Vector(0, 0, -1))
+                ),
+                "Ray intersects plane but outside triangle"
+        );
+    }
+
 }

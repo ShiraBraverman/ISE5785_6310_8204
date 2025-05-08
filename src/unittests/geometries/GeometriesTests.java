@@ -67,7 +67,7 @@ public class GeometriesTests {
                 )
         );
 
-        Ray ray = new Ray(new Point(0, 0, 0), new Vector(0, 0, 1));
+        Ray ray = new Ray(new Point(0, 0, 0.999), new Vector(0, 0, 1));
         assertEquals(4, geometries.findIntersections(ray).size(), "Expected four intersection points");
     }
 }

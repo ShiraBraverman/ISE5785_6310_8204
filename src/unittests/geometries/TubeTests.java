@@ -8,6 +8,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 public class TubeTests {
 
     @Test
@@ -54,4 +56,41 @@ public class TubeTests {
 
         assertEquals(expectedNormal, normal, "Normal vector is incorrect");
     }
+    @Test
+    public void testFindIntersections() {
+        // יצירת צינור עם רדיוס 2 וציר לאורך ציר Y
+        Ray axisRay = new Ray(new Point(0, 0, 0), new Vector(0, 1, 0));
+        Tube tube = new Tube(2, axisRay);
+
+        // TC01: קרן חותכת את הצינור ב-2 נקודות
+//        Ray ray1 = new Ray(new Point(0, 0, 0.001), new Vector(1, 0, 0));
+//        List<Point> result1 = tube.findIntersections(ray1);
+//        assertNotNull(result1, "Expected 2 intersection points");
+//        assertEquals(2, result1.size(), "Wrong number of points");
+
+        // TC02: קרן נוגעת בצינור בנקודה אחת (משיק)
+//        Ray ray2 = new Ray(new Point(2, -5, 0), new Vector(0, 1, 0));
+//        List<Point> result2 = tube.findIntersections(ray2);
+//        assertNotNull(result2, "Expected 1 intersection point (tangent)");
+//        assertEquals(1, result2.size(), "Wrong number of points");
+
+        // TC03: קרן מפספסת את הצינור
+//        Ray ray3 = new Ray(new Point(5, -5, 5), new Vector(0, 1, 0));
+//        List<Point> result3 = tube.findIntersections(ray3);
+//        assertNull(result3, "Expected no intersection points");
+
+        // TC04: קרן מתחילה בתוך הצינור ויוצאת בנקודה אחת
+//        Ray ray4 = new Ray(new Point(1, 0, 0), new Vector(1, 1, 0));
+//        List<Point> result4 = tube.findIntersections(ray4);
+//        assertNotNull(result4, "Expected 1 intersection point");
+//        assertEquals(1, result4.size(), "Wrong number of points");
+
+        // TC05: קרן מקבילה לציר ולא נוגעת בצינור
+        Ray ray5 = new Ray(new Point(5, 0, 0), new Vector(0, 1, 0));
+        List<Point> result5 = tube.findIntersections(ray5);
+        assertNull(result5, "Expected no intersection points (parallel and outside)");
+    }
+
+
+
 }

@@ -81,6 +81,7 @@ public class Plane extends Geometry {
         double denom = normal.dotProduct(rayDirection);
         System.out.println("denom = " + denom + " (isZero = " + isZero(denom) + ")");
 
+        // אם הקרן מקבילה למישור – אין חיתוך
         if (isZero(denom)) {
             System.out.println("Ray is parallel to the plane.");
             return null;
@@ -92,12 +93,14 @@ public class Plane extends Geometry {
         double t = num / denom;
         System.out.println("t = " + t);
 
-        if (t >= 0 && num * denom > 0) {
-            Point intersection = ray.getPoint(t);
-            return List.of(intersection);
+        // חיתוך "קדימה" בלבד (קרן מכוונת לעבר המישור)
+        if (t > 0 && denom > 0) {
+            return List.of(ray.getPoint(t));
         }
 
-        System.out.println("Intersection is behind the ray's origin.");
+        // חיתוך מאחורי התחלת הקרן או בכיוון הלא נכון
+        System.out.println("Intersection is behind the ray's origin or in wrong direction.");
         return null;
     }
+
 }

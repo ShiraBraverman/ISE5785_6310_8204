@@ -3,6 +3,10 @@ package unittests.geometries;
 import geometries.Sphere;
 import primitives.Point;
 import primitives.Vector;
+import primitives.Ray;
+import java.util.List;
+
+
 
 import org.junit.jupiter.api.Test;
 
@@ -55,4 +59,27 @@ public class SphereTests {
         assertEquals(new Vector(1, 0, 0), normal, "Normal vector is incorrect");
         assertEquals(1.0, normal.length(), 0.0001, "Normal vector should have unit length");
     }
+    @Test
+    void testFindIntersections() {
+        Sphere sphere = new Sphere(new Point(0, 0, 0), 1);
+
+        Ray ray = new Ray(new Point(-2, 0, 0), new Vector(1, 0, 0));
+
+        List<Point> result = sphere.findIntersections(ray);
+
+        // בודקים שהתוצאה לא null
+        assertNotNull(result, "The ray should intersect the sphere");
+
+        // בודקים שיש בדיוק שתי נקודות חיתוך
+        assertEquals(2, result.size(), "Wrong number of intersection points");
+
+        // בודקים את הנקודות עצמן
+        Point p1 = new Point(-1, 0, 0);
+        Point p2 = new Point(1, 0, 0);
+
+        // ודאו שהן נמצאות בתוך התוצאה (בלי תלות בסדר)
+        assertTrue(result.contains(p1), "Missing expected intersection point: " + p1);
+        assertTrue(result.contains(p2), "Missing expected intersection point: " + p2);
+    }
+
 }
