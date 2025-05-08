@@ -26,9 +26,10 @@ public class Vector extends Point {
      */
     public Vector(double x, double y, double z) {
         super(x, y, z);
-        if (coordinates.equals(Double3.ZERO)) {
+        if (primitives.Util.isZero(x) && primitives.Util.isZero(y) && primitives.Util.isZero(z)) {
             throw new ArithmeticException("Zero vector is not allowed");
         }
+
     }
 
     /**
@@ -131,11 +132,12 @@ public class Vector extends Point {
      */
     public Vector normalize() {
         double len = length();
-        if (len == 0) {
+        if (primitives.Util.isZero(len)) {
             throw new ArithmeticException("Cannot normalize a zero vector");
         }
-        return this.scale(1 / len);  // Scaling the vector to make its length 1
+        return this.scale(1 / len);
     }
+
 
     /**
      * Returns a string representation of the vector in the format "Vector(x, y, z)".

@@ -14,13 +14,7 @@ import static primitives.Util.isZero;
  */
 public class Plane extends Geometry {
 
-    /**
-     * The point on the plane
-     */
     private final Point point;
-    /**
-     * The normal vector to the plane
-     */
     private final Vector normal;
 
     /**
@@ -33,22 +27,22 @@ public class Plane extends Geometry {
      * @param p3 The third point defining the plane.
      */
     public Plane(Point p1, Point p2, Point p3) {
-        // Calculate two vectors from the points by subtracting the points
         Vector v1 = p2.subtract(p1);
         Vector v2 = p3.subtract(p1);
 
-        // The normal vector is the cross product of the two vectors
+        System.out.println("Creating Plane from 3 points:");
+        System.out.println("v1: " + v1 + ", v2: " + v2);
+
         Vector normalUnnormalized = v1.crossProduct(v2);
+
+        System.out.println("crossProduct (unnormalized normal): " + normalUnnormalized);
 
         if (normalUnnormalized.length() == 0) {
             throw new IllegalArgumentException("The three points are collinear and cannot define a plane.");
         }
 
-        // Store the point as the reference point for the plane
         this.point = p1;
-
-        // The normal is not normalized yet, so we leave it as is
-        this.normal = normalUnnormalized.normalize(); // Store the calculated normal
+        this.normal = normalUnnormalized.normalize();
     }
 
     /**
@@ -59,44 +53,25 @@ public class Plane extends Geometry {
      * @param normal The normal vector to the plane (not necessarily normalized).
      */
     public Plane(Point point, Vector normal) {
+        System.out.println("Creating Plane with point: " + point + ", and normal: " + normal);
+
         if (normal.equals(new Vector(0, 0, 0))) {
             throw new IllegalArgumentException("Normal vector cannot be a zero vector");
         }
 
         this.point = point;
-        // Normalize the normal vector before storing it
         this.normal = normal.normalize();
     }
 
-    /**
-     * Returns the normal vector to the plane.
-     * If the plane was initialized with three points, the normal is calculated.
-     *
-     * @return The normal vector to the plane.
-     */
     @Override
     public Vector getNormal(Point point) {
-        if (normal == null) {
-            throw new UnsupportedOperationException("Normal is not calculated yet.");
-        }
         return normal;
     }
 
-    /**
-     * Returns the reference point on the plane.
-     *
-     * @return The reference point on the plane.
-     */
     public Point getPoint() {
         return point;
     }
 
-    /**
-     * Finds the intersection points of the plane with a given ray.
-     *
-     * @param ray The ray to check for intersections.
-     * @return A list of points where the ray intersects the plane, or null if no intersection.
-     */
     @Override
     public List<Point> findIntersections(Ray ray) {
         Vector normal = this.normal;
@@ -119,11 +94,10 @@ public class Plane extends Geometry {
 
         if (t >= 0 && num * denom > 0) {
             Point intersection = ray.getPoint(t);
-            return List.of(intersection);  // Return the intersection point as a list
+            return List.of(intersection);
         }
 
         System.out.println("Intersection is behind the ray's origin.");
         return null;
     }
-
 }

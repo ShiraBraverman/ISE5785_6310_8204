@@ -1,73 +1,73 @@
-package unittests.geometries;
+package unittests;
 
 import geometries.*;
-import primitives.*;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
-import java.util.List;
+import primitives.Point;
+import primitives.Ray;
+import primitives.Vector;
 
-/**
- * Unit tests for geometries.Geometries class
- */
+import static org.junit.jupiter.api.Assertions.*;
+
 public class GeometriesTests {
 
-    // מקרה BVA: אוסף ריק (null צפוי)
     @Test
-    public void testEmptyCollection() {
+    public void testEmptyGeometries() {
         Geometries geometries = new Geometries();
-        Ray ray = new Ray(new Point(0, 0, 0), new Vector(1, 0, 0));
+        Ray ray = new Ray(new Point(1.0, 2.0, 3.0), new Vector(1.0, 1.0, 1.0));
         assertNull(geometries.findIntersections(ray), "Expected null for empty geometries collection");
     }
 
-    // מקרה BVA: אף צורה לא נחתכת (null צפוי)
     @Test
     public void testNoIntersection() {
         Geometries geometries = new Geometries(
-                new Sphere(1, new Point(0, 0, 5)),
-                new Plane(new Point(0, 0, 5), new Vector(0, 0, 1))
+                new Sphere(new Point(10, 10, 10), 2),
+                new Plane(new Point(-5, -5, -5), new Vector(1, -1, 2))
         );
-        Ray ray = new Ray(new Point(0, 0, 0), new Vector(0, 1, 0));
+
+        Ray ray = new Ray(new Point(0, 0, 0), new Vector(-1, -2, -1));
         assertNull(geometries.findIntersections(ray), "Expected null when ray does not intersect any geometry");
     }
 
-    // מקרה BVA: צורה אחת בלבד נחתכת (מצפים ל-1 או 2 נקודות, תלוי בגוף)
     @Test
-    public void testOneIntersection() {
+    public void testSingleIntersection() {
         Geometries geometries = new Geometries(
-                new Sphere(1, new Point(0, 0, 3)), // נחתכת
-                new Plane(new Point(0, 0, 5), new Vector(0, 0, 1)) // לא נחתכת
+                new Sphere(new Point(5, 0, 0), 1.0),
+                new Plane(new Point(0, 5, 0), new Vector(0, -1, 1))
         );
-        Ray ray = new Ray(new Point(0, 0, 0), new Vector(0, 0, 1));
-        List<Point> result = geometries.findIntersections(ray);
-        assertNotNull(result, "Expected one intersection");
-        assertTrue(result.size() == 2, "Expected 2 points of intersection with sphere");
+
+        Ray ray = new Ray(new Point(2, 0, 0), new Vector(1, 0.1, 0.0));
+        assertEquals(1, geometries.findIntersections(ray).size(), "Expected one intersection point");
     }
 
-    // מקרה EP: כמה צורות נחתכות, אך לא כולן
     @Test
-    public void testSomeIntersected() {
+    public void testSomeIntersections() {
         Geometries geometries = new Geometries(
-                new Sphere(1, new Point(0, 0, 3)), // נחתכת
-                new Plane(new Point(0, 0, 4), new Vector(0, 0, 1)), // נחתכת
-                new Plane(new Point(0, 0, -5), new Vector(0, -1, 0)) // לא נחתכת
+                new Sphere(new Point(3, 3, 3), 2),
+                new Plane(new Point(1, 2, 0), new Vector(2, 3, 1)),
+                new Triangle(
+                        new Point(2, 0, 2),
+                        new Point(4, 2, 1),
+                        new Point(3, 1, 4)
+                )
         );
-        Ray ray = new Ray(new Point(0, 0, 0), new Vector(0, 0, 1));
-        List<Point> result = geometries.findIntersections(ray);
-        assertNotNull(result, "Expected intersections with some geometries");
-        assertEquals(3, result.size(), "Expected 3 intersection points");
+
+        Ray ray = new Ray(new Point(0, 0, 0), new Vector(3, 3, 3));
+        assertEquals(3, geometries.findIntersections(ray).size(), "Expected three intersection points");
     }
 
-    // מקרה BVA: כל הצורות נחתכות
     @Test
     public void testAllIntersected() {
         Geometries geometries = new Geometries(
-                new Sphere(1, new Point(0, 0, 3)),     // 2 נקודות
-                new Plane(new Point(0, 0, 2), new Vector(0, 0, 1)), // 1 נקודה
-                new Triangle(new Point(-1, 1, 4), new Point(1, 1, 4), new Point(0, -1, 4)) // 1 נקודה
+                new Sphere(new Point(0, 0, 5), 1),
+                new Plane(new Point(0, 0, 4), new Vector(1, 2, 3)),
+                new Triangle(
+                        new Point(-1, 1, 4),
+                        new Point(1, 1, 4),
+                        new Point(0, -1, 4)
+                )
         );
+
         Ray ray = new Ray(new Point(0, 0, 0), new Vector(0, 0, 1));
-        List<Point> result = geometries.findIntersections(ray);
-        assertNotNull(result, "Expected intersections with all geometries");
-        assertEquals(4, result.size(), "Expected 4 intersection points total");
+        assertEquals(4, geometries.findIntersections(ray).size(), "Expected four intersection points");
     }
 }
