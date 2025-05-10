@@ -104,6 +104,8 @@ public class Polygon extends Geometry {
       return null; // If the point is not inside the polygon, no intersection
    }
 
+
+
    /**
     * This helper method checks if a point is inside the polygon.
     * The method uses the ray-casting algorithm to check if the point is inside the polygon.
@@ -112,15 +114,19 @@ public class Polygon extends Geometry {
     * @return true if the point is inside the polygon, false otherwise.
     */
    protected boolean isPointInPolygon(Point point) {
-// Retrieve the normal vector of the plane
       Vector n = plane.getNormal(vertices.get(0));
+      System.out.println("Checking if point " + point + " is inside the polygon.");
 
-      Vector v1 = vertices.get(vertices.size() - 1).subtract(point); // מהנקודה לאחרון
-      Vector v2 = vertices.get(0).subtract(point); // מהנקודה לראשון
+      Vector v1 = vertices.get(vertices.size() - 1).subtract(point);
+      Vector v2 = vertices.get(0).subtract(point);
       Vector cross = v1.crossProduct(v2);
-      double sign = alignZero(n.dotProduct(cross)); // סמן ראשוני
+      double sign = alignZero(n.dotProduct(cross));
+      System.out.println("Initial sign: " + sign);
 
-      if (isZero(sign)) return false; // אם המכפלה הסקלרית אפס - הנקודה על קו, לא בתוך מצולע
+      if (isZero(sign)) {
+         System.out.println("Point is on a line, not inside polygon.");
+         return false;
+      }
 
       boolean positive = sign > 0;
 
@@ -129,13 +135,20 @@ public class Polygon extends Geometry {
          v2 = vertices.get(i).subtract(point);
          cross = v1.crossProduct(v2);
          sign = alignZero(n.dotProduct(cross));
+         System.out.println("Sign for vertex " + i + ": " + sign);
 
-         if (isZero(sign)) return false; // אם בדיוק על הקו – לא בתוך
+         if (isZero(sign)) {
+            System.out.println("Point is on a line, not inside polygon.");
+            return false;
+         }
 
-         if ((sign > 0) != positive)
-            return false; // אם כיוון המכפלה השתנה – הנקודה מחוץ לפוליגון
+         if ((sign > 0) != positive) {
+            System.out.println("Point is outside the polygon.");
+            return false;
+         }
       }
 
+      System.out.println("Point is inside the polygon.");
       return true;
    }
 
@@ -148,8 +161,33 @@ public class Polygon extends Geometry {
     * @return true if the ray intersects with the edge, false otherwise.
     */
    private boolean doIntersect(Ray ray, Point p1, Point p2) {
-      // Here you need to implement the logic for intersection between the ray and the edge of the polygon.
-      // This is just a placeholder, and you would need to implement the actual intersection logic.
-      return false; // Placeholder, implement the actual intersection check
+      // Vector representing the edge of the polygon
+      Vector edgeVector = p2.subtract(p1);
+
+      // Vector from the ray's origin to the first point of the edge
+      Vector rayToEdge = p1.subtract(ray.getOrigin());
+
+      // Calculate the normal of the plane formed by the ray and the edge
+      Vector rayDirection = ray.getDirection();
+      Vector crossProduct = rayDirection.crossProduct(edgeVector);
+
+      // Check if the vectors are parallel (cross product = 0 means parallel)
+      if (isZero(crossProduct.length())) {
+         return false; // If the vectors are parallel, no intersection
+      }
+
+      // Find the intersection point using the determinant method
+      double t = rayToEdge.crossProduct(edgeVector).length() / crossProduct.length();
+      double u = rayToEdge.crossProduct(rayDirection).length() / crossProduct.length();
+
+      // Log the values of t and u for debugging
+      System.out.println("t: " + t + ", u: " + u);
+
+      // Check if the intersection point lies within the bounds of the edge
+      if (t >= 0 && u >= 0 && u <= 1) {
+         return true; // The intersection point is within the bounds of the edge
+      }
+
+      return false; // No intersection
    }
 }

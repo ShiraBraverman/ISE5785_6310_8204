@@ -1,5 +1,6 @@
 package geometries;
 
+import primitives.Double3;
 import primitives.Point;
 import primitives.Vector;
 import primitives.Ray;
@@ -55,7 +56,7 @@ public class Plane extends Geometry {
     public Plane(Point point, Vector normal) {
         System.out.println("Creating Plane with point: " + point + ", and normal: " + normal);
 
-        if (normal.equals(new Vector(0, 0, 0))) {
+        if (normal.equals(Double3.ZERO)) {
             throw new IllegalArgumentException("Normal vector cannot be a zero vector");
         }
 
@@ -94,7 +95,8 @@ public class Plane extends Geometry {
         System.out.println("t = " + t);
 
         // חיתוך "קדימה" בלבד (קרן מכוונת לעבר המישור)
-        if (t > 0 && denom > 0) {
+        // בדיקה אם הקרן מכוונת לעבר המישור (denom*num > 0) וגם נקודת החיתוך קדימה (t > 0)
+        if (t > 0 && denom * num > 0) {
             return List.of(ray.getPoint(t));
         }
 
@@ -102,5 +104,4 @@ public class Plane extends Geometry {
         System.out.println("Intersection is behind the ray's origin or in wrong direction.");
         return null;
     }
-
 }

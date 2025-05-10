@@ -64,5 +64,4 @@ public class Geometries implements Intersectable {
 
         return result;
     }
-
 }

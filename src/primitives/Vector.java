@@ -26,10 +26,10 @@ public class Vector extends Point {
      */
     public Vector(double x, double y, double z) {
         super(x, y, z);
+        System.out.println("Vector constructor called with: x=" + x + ", y=" + y + ", z=" + z);
         if (primitives.Util.isZero(x) && primitives.Util.isZero(y) && primitives.Util.isZero(z)) {
             throw new ArithmeticException("Zero vector is not allowed");
         }
-
     }
 
     /**
@@ -40,10 +40,12 @@ public class Vector extends Point {
      */
     public Vector(Double3 coordinates) {
         super(coordinates);
+        System.out.println("Vector constructor called with coordinates: " + coordinates);
         if (coordinates.equals(Double3.ZERO)) {
             throw new IllegalArgumentException("Zero vector is not allowed");
         }
     }
+
 
     /**
      * Adds another vector to the current vector and returns a new vector representing the sum.
@@ -77,9 +79,9 @@ public class Vector extends Point {
         // Dot product calculation using the Double3 class
         Double3 thisCoordinates = this.coordinates;
         Double3 otherCoordinates = other.coordinates;
-        return thisCoordinates.product(otherCoordinates).d1() +
-                thisCoordinates.product(otherCoordinates).d2() +
-                thisCoordinates.product(otherCoordinates).d3();
+        return thisCoordinates.d1() * otherCoordinates.d1() +
+                thisCoordinates.d2() * otherCoordinates.d2() +
+                thisCoordinates.d3() * otherCoordinates.d3();
     }
 
     /**
