@@ -6,6 +6,8 @@ import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class GeometriesTests {
@@ -24,20 +26,26 @@ public class GeometriesTests {
                 new Plane(new Point(-5, -5, -5), new Vector(1, -1, 2))
         );
 
-        Ray ray = new Ray(new Point(0, 0, 0), new Vector(-1, -2, -1));
+        Ray ray = new Ray(new Point(0, 0, 0), new Vector(1, 2, 1)); // פונה בכיוון הפוך מהמישור
         assertNull(geometries.findIntersections(ray), "Expected null when ray does not intersect any geometry");
     }
 
     @Test
-    public void testSingleIntersection() {
+    void testSingleIntersection() {
         Geometries geometries = new Geometries(
-                new Sphere(new Point(5, 0, 0), 1.0),
+                new Sphere(new Point(5, 0, 0), 2),
                 new Plane(new Point(0, 5, 0), new Vector(0, -1, 1))
         );
 
-        Ray ray = new Ray(new Point(2, 0, 0), new Vector(1, 0.1, 0.0));
-        assertEquals(1, geometries.findIntersections(ray).size(), "Expected one intersection point");
+        // הקרן נעה על ציר X מימין לשמאל, תעבור דרך הספירה ולא תחתוך את המישור
+        Ray ray = new Ray(new Point(2, 0, 0), new Vector(1, 0, 0));
+
+        List<Point> intersections = geometries.findIntersections(ray);
+
+        assertNotNull(intersections, "Expected intersection point");
+        assertEquals(2, intersections.size(), "Expected two intersection points with the sphere only");
     }
+
 
     @Test
     public void testSomeIntersections() {

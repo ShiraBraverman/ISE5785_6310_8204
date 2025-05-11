@@ -115,23 +115,24 @@ class PlaneTests {
         Point p3 = new Point(0, 1, 0);
         Plane plane = new Plane(p1, p2, p3);
 
-        // Test a ray that intersects the plane
-        Ray ray1 = new Ray(new Point(0, 0, -1), new Vector(0, 0, 1)); // Ray coming from below the plane
+        // 1. Ray that intersects the plane
+        Ray ray1 = new Ray(new Point(0, 0, -1), new Vector(0, 0, 1));
         List<Point> intersections1 = plane.findIntersections(ray1);
         assertNotNull(intersections1, "Ray should intersect the plane");
         assertEquals(1, intersections1.size(), "There should be exactly one intersection point");
         assertEquals(new Point(0, 0, 0), intersections1.get(0), "Intersection point is incorrect");
 
-        // Test a ray that is parallel to the plane (no intersection)
-        Ray ray2 = new Ray(new Point(0, 0, 1), new Vector(0, 1, 0)); // Ray parallel to the plane
+        // 2. Ray that is parallel to the plane (no intersection)
+        Ray ray2 = new Ray(new Point(0, 0, 1), new Vector(0, 1, 0));
         List<Point> intersections2 = plane.findIntersections(ray2);
         assertNull(intersections2, "Parallel ray should not intersect the plane");
 
-        // Test a ray that is not directed towards the plane (no intersection)
-        Ray ray3 = new Ray(new Point(0, 0, 1), new Vector(0, 0, -1)); // Ray coming from above the plane but directed away
+        // 3. Ray that goes away from the plane (no intersection)
+        Ray ray3 = new Ray(new Point(0, 0, 1), new Vector(0, 0, 1)); // זז הרחק מהמישור
         List<Point> intersections3 = plane.findIntersections(ray3);
         assertNull(intersections3, "Ray directed away from the plane should not intersect it");
     }
+
 
     /**
      * Test for intersection with a ray parallel to the plane.

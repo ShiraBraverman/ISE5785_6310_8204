@@ -4,6 +4,8 @@ import primitives.*;
 import java.util.LinkedList;
 import java.util.List;
 
+import static primitives.Util.isZero;
+
 /**
  * A class that represents a collection (aggregate) of geometric objects,
  * implemented according to the Composite design pattern.
@@ -54,7 +56,7 @@ public class Geometries implements Intersectable {
 
         for (Intersectable geo : geometries) {
             List<Point> intersections = geo.findIntersections(ray);
-            if (intersections != null) {
+            if (intersections != null && !intersections.isEmpty()) {
                 if (result == null) {
                     result = new LinkedList<>();
                 }
@@ -62,6 +64,7 @@ public class Geometries implements Intersectable {
             }
         }
 
-        return result;
+        return result == null || result.isEmpty() ? null : result;
     }
+
 }

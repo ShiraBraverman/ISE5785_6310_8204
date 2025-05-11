@@ -80,28 +80,19 @@ public class Plane extends Geometry {
         Vector rayDirection = ray.getDirection();
 
         double denom = normal.dotProduct(rayDirection);
-        System.out.println("denom = " + denom + " (isZero = " + isZero(denom) + ")");
-
-        // אם הקרן מקבילה למישור – אין חיתוך
         if (isZero(denom)) {
-            System.out.println("Ray is parallel to the plane.");
-            return null;
+            return null; // הקרן מקבילה למישור – אין חיתוך
         }
 
         double num = normal.dotProduct(this.point.subtract(rayOrigin));
-        System.out.println("num = " + num);
-
         double t = num / denom;
-        System.out.println("t = " + t);
 
-        // חיתוך "קדימה" בלבד (קרן מכוונת לעבר המישור)
-        // בדיקה אם הקרן מכוונת לעבר המישור (denom*num > 0) וגם נקודת החיתוך קדימה (t > 0)
-        if (t > 0 && denom * num > 0) {
+        // בדיקה אם נקודת החיתוך "קדימה" בלבד
+        if (t > 0) {
             return List.of(ray.getPoint(t));
         }
 
-        // חיתוך מאחורי התחלת הקרן או בכיוון הלא נכון
-        System.out.println("Intersection is behind the ray's origin or in wrong direction.");
-        return null;
+        return null; // החיתוך מאחורי התחלת הקרן
     }
+
 }
