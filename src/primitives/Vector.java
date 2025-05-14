@@ -15,7 +15,9 @@ package primitives;
  * Note: A zero vector (0, 0, 0) is not allowed for a valid Vector.
  */
 public class Vector extends Point {
-
+    public static final Vector AXIS_X = new Vector(1, 0, 0);
+    public static final Vector AXIS_Y = new Vector(0, 1, 0);
+    public static final Vector AXIS_Z = new Vector(0, 0, 1);
     /**
      * Constructs a Vector using three coordinates (x, y, z).
      * If the vector is a zero vector, an IllegalArgumentException is thrown.
@@ -26,7 +28,6 @@ public class Vector extends Point {
      */
     public Vector(double x, double y, double z) {
         super(x, y, z);
-        System.out.println("Vector constructor called with: x=" + x + ", y=" + y + ", z=" + z);
         if (primitives.Util.isZero(x) && primitives.Util.isZero(y) && primitives.Util.isZero(z)) {
             throw new ArithmeticException("Zero vector is not allowed");
         }
@@ -40,7 +41,6 @@ public class Vector extends Point {
      */
     public Vector(Double3 coordinates) {
         super(coordinates);
-        System.out.println("Vector constructor called with coordinates: " + coordinates);
         if (coordinates.equals(Double3.ZERO)) {
             throw new IllegalArgumentException("Zero vector is not allowed");
         }
@@ -67,7 +67,7 @@ public class Vector extends Point {
     public Vector scale(Double scalar) {
         return new Vector(coordinates.scale(scalar));
     }
-
+    public Vector scale(int scalar) { return scale((double) scalar);}
     /**
      * Calculates the dot product (scalar product) of the current vector and another vector.
      * The dot product is a measure of the vectors' similarity in direction.
