@@ -1,5 +1,9 @@
 package primitives;
 import primitives.Vector;
+import java.util.List;
+
+
+
 
 
 /**
@@ -100,4 +104,20 @@ public class Ray {
     public Point getHead() {
         return origin;
     }
+    public Point findClosestPoint(List<Point> points) {
+        if (points == null || points.isEmpty()) return null;
+
+        Point closest = points.get(0);
+        double minDistance = origin.distance(closest);
+
+        for (Point p : points) {
+            double dist = origin.distance(p);
+            if (dist < minDistance) {
+                closest = p;
+                minDistance = dist;
+            }
+        }
+        return closest;
+    }
+
 }

@@ -3,6 +3,14 @@ package renderer;
 import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
+import primitives.Color;
+import renderer.raytracer.*;
+import renderer.imagewriter.*;
+import scene.Scene;
+import renderer.SimpleRayTracer;
+import renderer.RayTracerBase;
+import renderer.RayTracerType;
+
 
 import java.util.MissingResourceException;
 
@@ -12,13 +20,15 @@ import static primitives.Util.isZero;
 /**
  * The {@code Camera} class represents a virtual camera in a 3D space,
  * defining its position, orientation, and the view plane properties.
- * It uses the Builder design pattern for flexible construction.
  */
 public class Camera implements Cloneable {
 
     private Point p0;
     private Vector vTo, vUp, vRight;
     private double width = 0.0, height = 0.0, distance = 0.0;
+    private ImageWriter imageWriter;
+    private RayTracerBase rayTracer;
+    private int nX = 1, nY = 1; // default resolution
 
     /**
      * Private constructor to enforce the use of the Builder pattern.
@@ -60,31 +70,61 @@ public class Camera implements Cloneable {
     }
 
     /**
+     * Renders the image.
+     *
+     * @return the camera object
+     */
+    public Camera renderImage() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Prints a grid on the image.
+     *
+     * @param interval the interval between lines
+     * @param color    the color of the grid lines
+     * @return the camera object
+     */
+    public Camera printGrid(int interval, Color color) {
+        if (imageWriter == null)
+            throw new IllegalStateException("imageWriter is not initialized");
+
+        for (int i = 0; i < nY; i++) {
+            for (int j = 0; j < nX; j++) {
+                if (i % interval == 0 || j % interval == 0) {
+                    imageWriter.writePixel(j, i, color);
+                }
+            }
+        }
+        return this;
+    }
+
+    /**
+     * Writes the image to a file.
+     *
+     * @param filename the file name without extension
+     * @return the camera object
+     */
+    public Camera writeToImage(String filename) {
+        if (imageWriter == null)
+            throw new IllegalStateException("imageWriter is not initialized");
+
+        imageWriter.writeToImage(filename);
+        return this;
+    }
+
+    /**
      * Builder class to construct {@link Camera} instances using chained methods.
      */
     public static class Builder {
 
         private final Camera camera = new Camera();
 
-        /**
-         * Sets the camera's location in 3D space.
-         *
-         * @param p0 the camera location
-         * @return the builder instance
-         */
         public Builder setLocation(Point p0) {
             camera.p0 = p0;
             return this;
         }
 
-        /**
-         * Sets the direction of the camera using orthogonal vectors.
-         *
-         * @param vTo the "to" direction
-         * @param vUp the "up" direction
-         * @return the builder instance
-         * @throws IllegalArgumentException if vectors are not orthogonal
-         */
         public Builder setDirection(Vector vTo, Vector vUp) {
             if (!isZero(vTo.dotProduct(vUp))) {
                 throw new IllegalArgumentException("the vectors must be orthogonal");
@@ -94,13 +134,6 @@ public class Camera implements Cloneable {
             return this;
         }
 
-        /**
-         * Sets the direction of the camera based on a target point and an up vector.
-         *
-         * @param target the point the camera looks at
-         * @param up     the up vector
-         * @return the builder instance
-         */
         public Builder setDirection(Point target, Vector up) {
             Vector vTo = target.subtract(camera.p0).normalize();
             Vector vRight = vTo.crossProduct(up).normalize();
@@ -112,13 +145,6 @@ public class Camera implements Cloneable {
             return this;
         }
 
-        /**
-         * Sets the direction of the camera using a target point and a default up vector (Y-axis).
-         *
-         * @param target the point the camera looks at
-         * @return the builder instance
-         * @throws IllegalArgumentException if the calculated direction is invalid
-         */
         public Builder setDirection(Point target) {
             Vector defaultUp = new Vector(0, 1, 0);
             Vector vTo = target.subtract(camera.p0).normalize();
@@ -137,14 +163,6 @@ public class Camera implements Cloneable {
             return this;
         }
 
-        /**
-         * Sets the view plane size.
-         *
-         * @param width  the width of the view plane
-         * @param height the height of the view plane
-         * @return the builder instance
-         * @throws IllegalArgumentException if width or height is not positive
-         */
         public Builder setVpSize(double width, double height) {
             if (width <= 0 || height <= 0) {
                 throw new IllegalArgumentException("width and height must be positive");
@@ -154,13 +172,6 @@ public class Camera implements Cloneable {
             return this;
         }
 
-        /**
-         * Sets the distance from the camera to the view plane.
-         *
-         * @param distance the view plane distance
-         * @return the builder instance
-         * @throws IllegalArgumentException if distance is not positive
-         */
         public Builder setVpDistance(double distance) {
             if (distance <= 0) {
                 throw new IllegalArgumentException("distance must be positive");
@@ -170,23 +181,37 @@ public class Camera implements Cloneable {
         }
 
         /**
-         * (Optional) Method stub to set resolution. Currently not implemented.
+         * Sets the resolution of the camera.
          *
          * @param nX number of pixels in X-direction
          * @param nY number of pixels in Y-direction
-         * @return currently returns null
+         * @return the builder instance
          */
         public Builder setResolution(int nX, int nY) {
-            return null;
+            if (nX <= 0 || nY <= 0) {
+                throw new IllegalArgumentException("Resolution must be positive");
+            }
+            camera.nX = nX;
+            camera.nY = nY;
+            return this;
         }
 
         /**
-         * Finalizes the camera construction after validation.
+         * Sets the ray tracer for the camera.
          *
-         * @return the constructed Camera instance
-         * @throws MissingResourceException if any required field is missing
-         * @throws IllegalArgumentException if direction vectors are not valid
+         * @param scene        the scene to trace
+         * @param rayTracerType the type of ray tracer
+         * @return the builder instance
          */
+        public Builder setRayTracer(Scene scene, RayTracerType rayTracerType) {
+            if (rayTracerType == RayTracerType.SIMPLE) {
+                camera.rayTracer = new SimpleRayTracer(scene);
+            } else {
+                camera.rayTracer = null;
+            }
+            return this;
+        }
+
         public Camera build() {
             final String description = "Missing rendering data";
             final String className = "Camera";
@@ -197,10 +222,15 @@ public class Camera implements Cloneable {
             if (isZero(camera.width)) throw new MissingResourceException(description, className, "width");
             if (isZero(camera.height)) throw new MissingResourceException(description, className, "height");
             if (isZero(camera.distance)) throw new MissingResourceException(description, className, "distance");
+            if (camera.nX <= 0 || camera.nY <= 0) {
+                throw new IllegalArgumentException("Resolution values must be positive");
+            }
 
-            if (camera.width < 0) throw new IllegalArgumentException("width must be positive");
-            if (camera.height < 0) throw new IllegalArgumentException("height must be positive");
-            if (camera.distance < 0) throw new IllegalArgumentException("distance must be positive");
+            camera.imageWriter = new ImageWriter(camera.nX, camera.nY);
+
+            if (camera.rayTracer == null) {
+                camera.rayTracer = new SimpleRayTracer(null); // Empty scene
+            }
 
             camera.vRight = (camera.vTo.crossProduct(camera.vUp)).normalize();
 
