@@ -1,6 +1,8 @@
 package geometries;
 
 import primitives.*;
+
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -38,9 +40,7 @@ public class Geometries implements Intersectable {
      */
     public void add(Intersectable... geometries) {
         if (geometries != null) {
-            for (Intersectable geo : geometries) {
-                this.geometries.add(geo);
-            }
+            this.geometries.addAll(Arrays.asList(geometries));
         }
     }
 
