@@ -10,33 +10,36 @@ import java.util.List;
 import static primitives.Util.isZero;
 
 /**
- * This class represents a plane in 3D space, defined by a point and a normal vector.
- * It can be initialized using either three points or a point and a normal vector.
+ * Plane class represents a 3D plane defined either by three points or by a point and a normal vector.
+ * The plane is characterized by a point lying on it and a perpendicular normal vector.
  */
 public class Plane extends Geometry {
 
+    /**
+     * A point that lies on the plane.
+     */
     private final Point point;
+
+    /**
+     * The normalized normal vector perpendicular to the plane surface.
+     */
     private final Vector normal;
 
     /**
-     * Constructor that initializes the plane based on three points.
-     * This constructor calculates the normal vector by taking the cross product of two vectors
-     * defined by the three points, and stores one of the points as the reference point for the plane.
+     * Constructor that creates a plane from three non-collinear points.
+     * It computes the normal vector as the normalized cross product of two vectors
+     * formed by the points.
      *
      * @param p1 The first point defining the plane.
      * @param p2 The second point defining the plane.
      * @param p3 The third point defining the plane.
+     * @throws IllegalArgumentException If the three points are collinear (do not define a plane).
      */
     public Plane(Point p1, Point p2, Point p3) {
         Vector v1 = p2.subtract(p1);
         Vector v2 = p3.subtract(p1);
 
-        System.out.println("Creating Plane from 3 points:");
-        System.out.println("v1: " + v1 + ", v2: " + v2);
-
         Vector normalUnnormalized = v1.crossProduct(v2);
-
-        System.out.println("crossProduct (unnormalized normal): " + normalUnnormalized);
 
         if (normalUnnormalized.length() == 0) {
             throw new IllegalArgumentException("The three points are collinear and cannot define a plane.");
@@ -47,32 +50,53 @@ public class Plane extends Geometry {
     }
 
     /**
-     * Constructor that initializes the plane with a point and a normal vector.
-     * The normal vector must be normalized.
+     * Constructor that creates a plane from a point and a normal vector.
+     * The normal vector will be normalized internally.
      *
-     * @param point  A point on the plane.
-     * @param normal The normal vector to the plane (not necessarily normalized).
+     * @param point  A point lying on the plane.
+     * @param normal A vector perpendicular to the plane (not necessarily normalized).
+     * @throws IllegalArgumentException If the normal vector is a zero vector.
      */
     public Plane(Point point, Vector normal) {
-        System.out.println("Creating Plane with point: " + point + ", and normal: " + normal);
-
         if (normal.equals(Double3.ZERO)) {
-            throw new IllegalArgumentException("Normal vector cannot be a zero vector");
+            throw new IllegalArgumentException("Normal vector cannot be a zero vector.");
         }
 
         this.point = point;
         this.normal = normal.normalize();
     }
 
+    /**
+     * Returns the normalized normal vector to the plane at any given point.
+     * Since the plane is flat, the normal vector is constant everywhere.
+     *
+     * @param point The point on the plane (ignored because normal is constant).
+     * @return The normalized normal vector of the plane.
+     */
     @Override
     public Vector getNormal(Point point) {
         return normal;
     }
 
+    /**
+     * Returns a point on the plane.
+     *
+     * @return The reference point of the plane.
+     */
     public Point getPoint() {
         return point;
     }
 
+    /**
+     * Finds the intersection point(s) of the plane with a given ray.
+     * <p>
+     * The method calculates the parameter t for the ray equation and returns
+     * the intersection point if it lies in front of the ray origin.
+     * If the ray is parallel to the plane or the intersection is behind the ray origin, it returns null.
+     *
+     * @param ray The ray to test for intersection with the plane.
+     * @return A list containing the intersection point if exists, or null if no intersection.
+     */
     @Override
     public List<Point> findIntersections(Ray ray) {
         Vector normal = this.normal;
@@ -81,18 +105,16 @@ public class Plane extends Geometry {
 
         double denom = normal.dotProduct(rayDirection);
         if (isZero(denom)) {
-            return null; // הקרן מקבילה למישור – אין חיתוך
+            return null; // Ray is parallel to the plane - no intersections
         }
 
         double num = normal.dotProduct(this.point.subtract(rayOrigin));
         double t = num / denom;
 
-        // בדיקה אם נקודת החיתוך "קדימה" בלבד
         if (t > 0) {
-            return List.of(ray.getPoint(t));
+            return List.of(ray.getPoint(t)); // Intersection point in front of ray origin
         }
 
-        return null; // החיתוך מאחורי התחלת הקרן
+        return null; // Intersection is behind the ray origin
     }
-
 }

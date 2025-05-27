@@ -9,34 +9,38 @@ import java.util.List;
 import static primitives.Util.isZero;
 
 /**
- * A class that represents a collection (aggregate) of geometric objects,
- * implemented according to the Composite design pattern.
+ * Geometries class represents a collection (aggregate) of multiple geometric objects.
+ * This class follows the Composite design pattern, allowing multiple geometries to be treated as one.
+ * It implements the Intersectable interface, so it can find intersections for all contained geometries.
  */
 public class Geometries implements Intersectable {
 
-    // A list to hold all geometric objects in the collection
+    /**
+     * A list that stores all the geometric objects in this collection.
+     * Each object implements the Intersectable interface.
+     */
     private final List<Intersectable> geometries = new LinkedList<>();
 
     /**
-     * Default constructor - creates an empty list of geometries.
+     * Default constructor that creates an empty collection of geometries.
      */
     public Geometries() {
-        // Empty constructor - do not add anything here
+        // No geometries added initially
     }
 
     /**
      * Constructor that accepts multiple geometries and adds them to the collection.
      *
-     * @param geometries one or more intersectable geometries to add
+     * @param geometries One or more intersectable geometries to add to this collection.
      */
     public Geometries(Intersectable... geometries) {
-        add(geometries); // DRY principle - delegate to the add method
+        add(geometries);  // Use the add method to insert geometries
     }
 
     /**
-     * Adds one or more geometries to the collection.
+     * Adds one or more geometries to this collection.
      *
-     * @param geometries one or more intersectable geometries to add
+     * @param geometries One or more intersectable geometries to add.
      */
     public void add(Intersectable... geometries) {
         if (geometries != null) {
@@ -45,10 +49,12 @@ public class Geometries implements Intersectable {
     }
 
     /**
-     * Finds intersections of a ray with all geometries in the collection.
+     * Finds all intersection points of a given ray with every geometry in this collection.
+     * The method iterates over each geometry and collects their intersection points into one list.
      *
-     * @param ray the ray to test for intersections
-     * @return a list of intersection points, or null if there are none
+     * @param ray The ray to intersect with the geometries.
+     * @return A list of intersection points if any intersections are found;
+     * otherwise, returns null.
      */
     @Override
     public List<Point> findIntersections(Ray ray) {
@@ -66,5 +72,4 @@ public class Geometries implements Intersectable {
 
         return result == null || result.isEmpty() ? null : result;
     }
-
 }

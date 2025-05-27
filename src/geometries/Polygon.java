@@ -115,16 +115,13 @@ public class Polygon extends Geometry {
     */
    protected boolean isPointInPolygon(Point point) {
       Vector n = plane.getNormal(vertices.get(0));
-      System.out.println("Checking if point " + point + " is inside the polygon.");
 
       Vector v1 = vertices.get(vertices.size() - 1).subtract(point);
       Vector v2 = vertices.get(0).subtract(point);
       Vector cross = v1.crossProduct(v2);
       double sign = alignZero(n.dotProduct(cross));
-      System.out.println("Initial sign: " + sign);
 
       if (isZero(sign)) {
-         System.out.println("Point is on a line, not inside polygon.");
          return false;
       }
 
@@ -133,22 +130,36 @@ public class Polygon extends Geometry {
       for (int i = 1; i < vertices.size(); ++i) {
          v1 = v2;
          v2 = vertices.get(i).subtract(point);
-         cross = v1.crossProduct(v2);
+         if (v1.length() == 0 || v2.length() == 0) {
+            return true;
+         }
+         try {
+            cross = v1.crossProduct(v2);
+         } catch (IllegalArgumentException e) {
+            return false;
+         }
+
+         if (isZero(cross.length())) {
+            // Check if the point is actually on the edge segment
+            double dotProduct = v1.dotProduct(v2);
+            if (dotProduct < 0) {
+               return true; // point is between the two vertices
+            } else {
+               return false; // point is on the extension beyond the edge
+            }
+         }
+
          sign = alignZero(n.dotProduct(cross));
-         System.out.println("Sign for vertex " + i + ": " + sign);
 
          if (isZero(sign)) {
-            System.out.println("Point is on a line, not inside polygon.");
             return false;
          }
 
          if ((sign > 0) != positive) {
-            System.out.println("Point is outside the polygon.");
             return false;
          }
       }
 
-      System.out.println("Point is inside the polygon.");
       return true;
    }
 
@@ -179,9 +190,6 @@ public class Polygon extends Geometry {
       // Find the intersection point using the determinant method
       double t = rayToEdge.crossProduct(edgeVector).length() / crossProduct.length();
       double u = rayToEdge.crossProduct(rayDirection).length() / crossProduct.length();
-
-      // Log the values of t and u for debugging
-      System.out.println("t: " + t + ", u: " + u);
 
       // Check if the intersection point lies within the bounds of the edge
       if (t >= 0 && u >= 0 && u <= 1) {
