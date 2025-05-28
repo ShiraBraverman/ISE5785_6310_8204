@@ -1,6 +1,6 @@
 package lighting;
 
-import java.awt.Color;
+import primitives.*;
 
 public class AmbientLight {
     // שדה עוצמת התאורה הסביבתית - פרטי ו-final

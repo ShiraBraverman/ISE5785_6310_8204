@@ -18,7 +18,7 @@ public class RenderTests {
     public RenderTests() { /* to satisfy JavaDoc generator */ }
 
     /** Camera builder of the tests */
-    private final Camera.Builder camera = Camera.getBuilder() //
+    private final renderer.Camera.Builder camera = renderer.Camera.getBuilder() //
             .setLocation(Point.ZERO).setDirection(new Point(0, 0, -1), Vector.AXIS_Y) //
             .setVpDistance(100) //
             .setVpSize(500, 500);
@@ -42,7 +42,7 @@ public class RenderTests {
                         new Triangle(new Point(100, 0, -100), new Point(0, -100, -100), new Point(100, -100, -100)));
 
         camera //
-                .setRayTracer(scene, RayTracerType.SIMPLE) //
+                .setRayTracer(scene, renderer.RayTracerType.SIMPLE) //
                 .setResolution(1000, 1000) //
                 .build() //
                 .renderImage() //
@@ -91,7 +91,7 @@ public class RenderTests {
         // NB: unit tests is not the correct place to put XML parsing code
 
         camera //
-                .setRayTracer(scene, RayTracerType.SIMPLE) //
+                .setRayTracer(scene, renderer.RayTracerType.SIMPLE) //
                 .setResolution(1000, 1000) //
                 .build() //
                 .renderImage() //
@@ -110,7 +110,7 @@ public class RenderTests {
         // NB: unit tests is not the correct place to put XML parsing code
 
         camera //
-                .setRayTracer(scene, RayTracerType.SIMPLE) //
+                .setRayTracer(scene, renderer.RayTracerType.SIMPLE) //
                 .setResolution(1000, 1000) //
                 .build() //
                 .renderImage() //

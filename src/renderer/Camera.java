@@ -4,8 +4,7 @@ import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
 import primitives.Color;
-import renderer.raytracer.*;
-import renderer.imagewriter.*;
+import renderer.ImageWriter.*;
 import scene.Scene;
 import renderer.SimpleRayTracer;
 import renderer.RayTracerBase;
@@ -75,7 +74,19 @@ public class Camera implements Cloneable {
      * @return the camera object
      */
     public Camera renderImage() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        if (imageWriter == null)
+            throw new IllegalStateException("imageWriter is not initialized");
+        if (rayTracer == null)
+            throw new IllegalStateException("rayTracer is not initialized");
+
+        for (int i = 0; i < nY; i++) {
+            for (int j = 0; j < nX; j++) {
+                Ray ray = constructRay(nX, nY, j, i);
+                Color color = rayTracer.traceRay(ray);
+                imageWriter.writePixel(j, i, color);
+            }
+        }
+        return this;
     }
 
     /**
