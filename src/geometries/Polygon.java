@@ -5,6 +5,8 @@ import java.util.List;
 import static primitives.Util.*;
 import primitives.*;
 
+import java.util.ArrayList;
+
 /**
  * The Polygon class represents a two-dimensional polygon in a 3D Cartesian coordinate system.
  * The polygon is defined by a list of ordered vertices and must be convex.
@@ -88,20 +90,18 @@ public class Polygon extends Geometry {
     * @return A list of points where the ray intersects the polygon, or null if there are no intersections.
     */
    @Override
-   public List<Point> findIntersections(Ray ray) {
-      // Step 1: Check intersection with the plane of the polygon
-      List<Point> intersections = plane.findIntersections(ray);
-      if (intersections == null || intersections.isEmpty()) {
-         return null; // If no intersection with the plane, return null (no intersection with the polygon)
+   protected List<Intersectable.Intersection> calculateIntersectionsHelper(Ray ray) {
+      List<Point> planeIntersections = plane.findIntersections(ray);
+      if (planeIntersections == null) return null;
+
+      List<Intersectable.Intersection> intersections = new ArrayList<>();
+      for (Point p : planeIntersections) {
+         if (isPointInPolygon(p)) {
+            intersections.add(new Intersectable.Intersection(this, p));
+         }
       }
 
-      // Step 2: Check if the intersection point is inside the polygon
-      Point intersectionPoint = intersections.get(0); // We know there's only one point on the plane
-      if (isPointInPolygon(intersectionPoint)) {
-         return List.of(intersectionPoint); // If the point is inside the polygon, return it
-      }
-
-      return null; // If the point is not inside the polygon, no intersection
+      return intersections.isEmpty() ? null : intersections;
    }
 
 

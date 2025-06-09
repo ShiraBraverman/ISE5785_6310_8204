@@ -49,38 +49,35 @@ public class Sphere extends RadialGeometry {
      * @return A list of points where the ray intersects the sphere, or an empty list if no intersection.
      */
     @Override
-    public List<Point> findIntersections(Ray ray) {
+    protected List<Intersectable.Intersection> calculateIntersectionsHelper(Ray ray) {
         Vector v = ray.getDirection();
         Point p0 = ray.getOrigin();
 
-        // אם הקרן מתחילה במרכז הכדור
         if (p0.equals(center)) {
-            return List.of(p0.add(v.scale(radius)));
+            Point p = p0.add(v.scale(radius));
+            return List.of(new Intersectable.Intersection(this, p));
         }
         Vector u = center.subtract(p0);
         double tm = alignZero(v.dotProduct(u));
         double d2 = alignZero(u.lengthSquared() - tm * tm);
 
         if (alignZero(d2 - radius * radius) > 0) {
-            return List.of(); // רשימה ריקה במקרה שאין חיתוך
+            return null;
         }
 
         double th = alignZero(Math.sqrt(radius * radius - d2));
         double t1 = alignZero(tm - th);
         double t2 = alignZero(tm + th);
 
-        List<Point> intersections = new ArrayList<>();
+        List<Intersectable.Intersection> intersections = new ArrayList<>();
 
-        // אם t1 ו t2 הם תקפים (חיוביים ומצויים בטווח), הוסף את הנקודות
         if (t1 > 0) {
-            intersections.add(ray.getPoint(t1));
+            intersections.add(new Intersectable.Intersection(this, ray.getPoint(t1)));
         }
         if (t2 > 0) {
-            intersections.add(ray.getPoint(t2));
+            intersections.add(new Intersectable.Intersection(this, ray.getPoint(t2)));
         }
 
-        return intersections.isEmpty() ? null : intersections;  // אם לא נמצאו חיתוכים, תחזור על null
+        return intersections.isEmpty() ? null : intersections;
     }
-
-
 }

@@ -13,7 +13,7 @@ import static primitives.Util.isZero;
  * This class follows the Composite design pattern, allowing multiple geometries to be treated as one.
  * It implements the Intersectable interface, so it can find intersections for all contained geometries.
  */
-public class Geometries implements Intersectable {
+public class Geometries extends Intersectable {
 
     /**
      * A list that stores all the geometric objects in this collection.
@@ -48,20 +48,12 @@ public class Geometries implements Intersectable {
         }
     }
 
-    /**
-     * Finds all intersection points of a given ray with every geometry in this collection.
-     * The method iterates over each geometry and collects their intersection points into one list.
-     *
-     * @param ray The ray to intersect with the geometries.
-     * @return A list of intersection points if any intersections are found;
-     * otherwise, returns null.
-     */
     @Override
-    public List<Point> findIntersections(Ray ray) {
-        List<Point> result = null;
+    protected List<Intersection> calculateIntersectionsHelper(Ray ray) {
+        List<Intersection> result = null;
 
         for (Intersectable geo : geometries) {
-            List<Point> intersections = geo.findIntersections(ray);
+            List<Intersection> intersections = geo.calculateIntersections(ray);
             if (intersections != null && !intersections.isEmpty()) {
                 if (result == null) {
                     result = new LinkedList<>();
@@ -70,6 +62,6 @@ public class Geometries implements Intersectable {
             }
         }
 
-        return result == null || result.isEmpty() ? null : result;
+        return result;
     }
 }

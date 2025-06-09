@@ -98,7 +98,7 @@ public class Plane extends Geometry {
      * @return A list containing the intersection point if exists, or null if no intersection.
      */
     @Override
-    public List<Point> findIntersections(Ray ray) {
+    protected List<Intersectable.Intersection> calculateIntersectionsHelper(Ray ray) {
         Vector normal = this.normal;
         Point rayOrigin = ray.getOrigin();
         Vector rayDirection = ray.getDirection();
@@ -112,7 +112,8 @@ public class Plane extends Geometry {
         double t = num / denom;
 
         if (t > 0) {
-            return List.of(ray.getPoint(t)); // Intersection point in front of ray origin
+            Point p = ray.getPoint(t);
+            return List.of(new Intersectable.Intersection(this, p));
         }
 
         return null; // Intersection is behind the ray origin

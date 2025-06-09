@@ -45,5 +45,5 @@ public abstract class RadialGeometry extends Geometry {
      * @return A list of points where the ray intersects the geometry, or null if no intersection.
      */
     @Override
-    public abstract List<Point> findIntersections(Ray ray);
+    protected abstract List<Intersectable.Intersection> calculateIntersectionsHelper(Ray ray);
 }

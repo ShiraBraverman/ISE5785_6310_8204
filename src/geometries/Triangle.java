@@ -31,19 +31,17 @@ public class Triangle extends Polygon {
      * @return A list of points where the ray intersects the triangle, or null if there are no intersections.
      */
     @Override
-    public List<Point> findIntersections(Ray ray) {
-        // Step 1: Find the intersection of the ray with the plane of the triangle
-        List<Point> planeIntersections = plane.findIntersections(ray);
-        if (planeIntersections == null || planeIntersections.isEmpty()) {
-            return null; // No intersection with the plane, return null
+    protected List<Intersectable.Intersection> calculateIntersectionsHelper(Ray ray) {
+        // בדיקה אם הקרן חותכת את המישור של המשולש
+        List<Intersectable.Intersection> planeIntersections = plane.calculateIntersectionsHelper(ray);
+        if (planeIntersections == null) {
+            return null;
         }
+        Point p = planeIntersections.get(0).point;
 
-        // Step 2: Check if the intersection point is inside the triangle
-        Point intersectionPoint = planeIntersections.get(0); // Only one intersection point with the plane
-        if (isPointInPolygon(intersectionPoint)) {
-            return List.of(intersectionPoint); // If the point is inside the triangle, return it
+        if (!isPointInPolygon(p)) {
+            return null;
         }
-
-        return null; // If the point is not inside the triangle, no intersection
+        return List.of(new Intersectable.Intersection(this, p));
     }
 }
