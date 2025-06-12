@@ -81,21 +81,48 @@ public class Tube extends RadialGeometry {
         Vector v = ray.getDirection();
         Point pa = axisRay.getOrigin();
 
-        Vector deltaP = p0.subtract(pa);
+        if (p0.equals(pa)) {
+            return null;
+        }
+
+        Vector deltaP;
+        try {
+            deltaP = p0.subtract(pa);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
 
         double vVa = v.dotProduct(vAxis);
-        Vector vMinusVa = v.subtract(vAxis.scale(vVa));
+
+        Vector vMinusVa;
+        try {
+            vMinusVa = v.subtract(vAxis.scale(vVa));
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
 
         double deltaPVa = deltaP.dotProduct(vAxis);
-        Vector deltaPMinusVa = deltaP.subtract(vAxis.scale(deltaPVa));
+
+        Vector deltaPMinusVa;
+        try {
+            deltaPMinusVa = deltaP.subtract(vAxis.scale(deltaPVa));
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
 
         double A = vMinusVa.lengthSquared();
+
+        if (isZero(A)) {
+            return null;
+        }
+
         double B = 2 * vMinusVa.dotProduct(deltaPMinusVa);
         double C = deltaPMinusVa.lengthSquared() - radius * radius;
 
         double discriminant = B * B - 4 * A * C;
+
         if (discriminant < 0) {
-            return intersections; // empty list
+            return null;
         }
 
         double sqrtDiscriminant = Math.sqrt(discriminant);
@@ -111,6 +138,6 @@ public class Tube extends RadialGeometry {
             intersections.add(new Intersectable.Intersection(this, p2));
         }
 
-        return intersections;
+        return intersections.isEmpty() ? null : intersections;
     }
 }
