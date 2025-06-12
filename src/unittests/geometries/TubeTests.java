@@ -90,7 +90,4 @@ public class TubeTests {
         List<Point> result5 = tube.findIntersections(ray5);
         assertNull(result5, "Expected no intersection points (parallel and outside)");
     }
-
-
-
 }

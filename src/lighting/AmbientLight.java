@@ -1,21 +1,22 @@
 package lighting;
 
-import primitives.*;
+import primitives.Color;
 
-public class AmbientLight {
-    // שדה עוצמת התאורה הסביבתית - פרטי ו-final
-    private final Color intensity;
-
-    // שדה סטטי קבוע של תאורה שחורה (אין תאורה)
+/**
+ * Class representing ambient light in the scene.
+ */
+public class AmbientLight extends Light {
+    /**
+     * Static constant representing no ambient light (black).
+     */
     public static final AmbientLight NONE = new AmbientLight(Color.BLACK);
 
-    // בנאי המקבל עוצמה מסוג Color
+    /**
+     * Constructor for ambient light.
+     *
+     * @param intensity the ambient light intensity (I<sub>a</sub>)
+     */
     public AmbientLight(Color intensity) {
-        this.intensity = intensity;
-    }
-
-    // מתודה ציבורית המחזירה את עוצמת התאורה
-    public Color getIntensity() {
-        return intensity;
+        super(intensity); // Call the parent constructor in Light
     }
 }
