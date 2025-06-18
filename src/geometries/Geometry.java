@@ -21,6 +21,7 @@ public abstract class Geometry extends Intersectable {
 
     /**
      * Default constructor for the Geometry class.
+     * Initializes the geometry with default emission color (black) and default material.
      */
     public Geometry() {
         // No specific initialization needed here
@@ -74,6 +75,17 @@ public abstract class Geometry extends Intersectable {
      */
     public abstract Vector getNormal(Point point);
 
+    /**
+     * Calculates the intersection points between a ray and the specific geometry.
+     *
+     * This abstract method must be implemented by all concrete geometry classes,
+     * and should return a list of intersection points (if any) between the given ray and the geometry.
+     * The implementation is expected to handle the internal intersection logic,
+     * excluding bounding volume checks (if implemented at a higher level).
+     *
+     * @param ray The ray to check for intersections with the geometry.
+     * @return A list of intersection points, or {@code null} if there are no intersections.
+     */
     @Override
     protected abstract List<Intersection> calculateIntersectionsHelper(Ray ray);
 }

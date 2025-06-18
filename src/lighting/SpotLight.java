@@ -8,8 +8,17 @@ import primitives.Vector;
  * Class representing a spotlight (focused point light).
  */
 public class SpotLight extends PointLight {
+    /**
+     * The direction vector of the spotlight.
+     */
     private final Vector direction;
-    private double narrowBeam = 1; // 1 = no narrowing, higher values = narrower beam
+
+    /**
+     * Beam narrowing factor (spotlight exponent).
+     * 1 means no narrowing (standard spotlight), higher values create a narrower and more focused beam.
+     */
+    private double narrowBeam = 1;
+
 
     /**
      * Constructor for SpotLight.
@@ -24,16 +33,27 @@ public class SpotLight extends PointLight {
     }
 
     /**
-     * Set the beam narrowing factor (higher = narrower beam)
+     * Sets the beam narrowing factor.
+     * A higher value results in a more focused (narrower) spotlight beam.
+     * For example: 1 = no narrowing, 10 = strong focus.
      *
-     * @param narrowBeam beam narrowing factor (e.g., 10)
-     * @return this SpotLight instance for chaining
+     * @param narrowBeam the beam narrowing factor (must be ≥ 1)
+     * @return this SpotLight instance (for chaining)
      */
     public SpotLight setNarrowBeam(int narrowBeam) {
         this.narrowBeam = narrowBeam;
         return this;
     }
 
+    /**
+     * Calculates the spotlight's intensity at a given point.
+     * The intensity is determined by both distance attenuation (from {@link PointLight})
+     * and the angle between the light direction and the vector to the point.
+     * A narrowing factor is applied using cosine falloff.
+     *
+     * @param p the point at which to calculate the intensity
+     * @return the color intensity at point p
+     */
     @Override
     public Color getIntensity(Point p) {
         Vector l = super.getL(p);
@@ -47,18 +67,36 @@ public class SpotLight extends PointLight {
         return super.getIntensity(p).scale(dirFactor); // attenuated * cos^narrowBeam
     }
 
+    /**
+     * Sets the constant attenuation factor.
+     *
+     * @param kC the constant attenuation factor
+     * @return this SpotLight instance (for chaining)
+     */
     @Override
     public SpotLight setKC(double kC) {
         super.setKC(kC);
         return this;
     }
 
+    /**
+     * Sets the linear attenuation factor.
+     *
+     * @param kL the linear attenuation factor
+     * @return this SpotLight instance (for chaining)
+     */
     @Override
     public SpotLight setKL(double kL) {
         super.setKL(kL);
         return this;
     }
 
+    /**
+     * Sets the quadratic attenuation factor.
+     *
+     * @param kQ the quadratic attenuation factor
+     * @return this SpotLight instance (for chaining)
+     */
     @Override
     public SpotLight setKQ(double kQ) {
         super.setKQ(kQ);

@@ -126,6 +126,15 @@ public class Ray {
         return closest;
     }
 
+    /**
+     * Finds the closest point to the ray's origin from a list of points.
+     *
+     * This method converts each point into an {@link geometries.Intersectable.Intersection} with a null geometry,
+     * and uses {@link #findClosestIntersection(List)} to find the closest one.
+     *
+     * @param points The list of points to check.
+     * @return The point closest to the ray's origin, or null if the list is null or empty.
+     */
     public Point findClosestPoint(List<Point> points) {
         if (points == null || points.isEmpty()) return null;
         Intersection closestIntersection = findClosestIntersection(

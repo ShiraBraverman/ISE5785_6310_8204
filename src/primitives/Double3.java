@@ -33,6 +33,13 @@ public record Double3(double d1, double d2, double d3) {
       this(value, value, value);
    }
 
+   /**
+    * Compares this Double3 to another object for equality, considering small
+    * differences (epsilon) using the isZero utility function.
+    *
+    * @param obj the object to compare with
+    * @return true if the other object is a Double3 and all components are approximately equal, false otherwise
+    */
    @Override
    public boolean equals(Object obj) {
       if (this == obj) return true;
@@ -42,11 +49,22 @@ public record Double3(double d1, double d2, double d3) {
               && isZero(d3 - other.d3);
    }
 
+   /**
+    * Generates a hash code for this Double3.
+    * The hash is based on the rounded sum of the components.
+    *
+    * @return the hash code
+    */
    @Override
    public int hashCode() {
       return (int) Math.round(d1 + d2 + d3);
    }
 
+   /**
+    * Returns a string representation of the Double3 in the format "(d1,d2,d3)".
+    *
+    * @return string representation of this Double3
+    */
    @Override
    public String toString() {
       return "(" + d1 + "," + d2 + "," + d3 + ")";

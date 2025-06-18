@@ -16,12 +16,12 @@ import static primitives.Util.isZero;
 public class Plane extends Geometry {
 
     /**
-     * A point that lies on the plane.
+     * A fixed reference point that lies on the plane.
      */
     private final Point point;
 
     /**
-     * The normalized normal vector perpendicular to the plane surface.
+     * A unit vector perpendicular to the plane's surface.
      */
     private final Vector normal;
 
@@ -68,9 +68,11 @@ public class Plane extends Geometry {
 
     /**
      * Returns the normalized normal vector to the plane at any given point.
+     * <p>
      * Since the plane is flat, the normal vector is constant everywhere.
+     * This method overrides the abstract method defined in {@link Geometry}.
      *
-     * @param point The point on the plane (ignored because normal is constant).
+     * @param point The point on the plane (not used, as normal is the same everywhere).
      * @return The normalized normal vector of the plane.
      */
     @Override

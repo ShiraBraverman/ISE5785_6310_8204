@@ -58,6 +58,14 @@ public class PointLight extends Light implements LightSource {
         return this;
     }
 
+    /**
+     * Computes the intensity of the light at a given point,
+     * considering distance-based attenuation using the formula:
+     * 1 / (kC + kL·d + kQ·d²)
+     *
+     * @param p The point at which to calculate the light intensity.
+     * @return The attenuated color intensity.
+     */
     @Override
     public Color getIntensity(Point p) {
         double d = position.distance(p);
@@ -65,8 +73,14 @@ public class PointLight extends Light implements LightSource {
         return intensity.scale(1.0 / attenuation);
     }
 
+    /**
+     * Returns the normalized direction vector from the light source to the given point.
+     *
+     * @param p The point to which the direction is needed.
+     * @return The normalized direction vector.
+     */
     @Override
     public Vector getL(Point p) {
-        return position.subtract(p).normalize(); // FROM light TO point
+        return position.subtract(p).normalize();
     }
 }

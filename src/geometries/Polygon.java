@@ -164,12 +164,14 @@ public class Polygon extends Geometry {
    }
 
    /**
-    * This method checks if the ray intersects with the edge of the polygon.
+    * Checks whether a ray intersects with the edge defined by two points.
+    * This method is not used currently in the main intersection logic,
+    * but can be useful for edge-specific intersection calculations.
     *
     * @param ray The ray to check for intersection.
-    * @param p1  The first point of the edge.
-    * @param p2  The second point of the edge.
-    * @return true if the ray intersects with the edge, false otherwise.
+    * @param p1  One end of the edge.
+    * @param p2  The other end of the edge.
+    * @return true if the ray intersects the edge segment, false otherwise.
     */
    private boolean doIntersect(Ray ray, Point p1, Point p2) {
       // Vector representing the edge of the polygon

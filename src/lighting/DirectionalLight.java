@@ -21,15 +21,27 @@ public class DirectionalLight extends Light implements LightSource {
         this.direction = direction.normalize(); // Always normalize for consistency
     }
 
+    /**
+     * Returns the intensity of the light at a given point.
+     * For directional light, the intensity is constant and independent of the point.
+     *
+     * @param p The point to get the light intensity at (ignored).
+     * @return The light's intensity.
+     */
     @Override
     public Color getIntensity(Point p) {
-        // For directional light, intensity is constant regardless of point
         return intensity;
     }
 
+    /**
+     * Returns the direction vector from the light source to the given point.
+     * For directional light, this is simply the inverse of the light's direction.
+     *
+     * @param p The point to which the light direction is needed.
+     * @return The direction vector from the light to the point.
+     */
     @Override
     public Vector getL(Point p) {
-        // The direction FROM the light TO the point is opposite of the direction field
-        return direction.scale(-1); // Returning vector FROM light TO point
+        return direction.scale(-1);
     }
 }

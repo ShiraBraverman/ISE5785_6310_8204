@@ -60,6 +60,13 @@ public abstract class Intersectable {
             this.material = geometry == null ? null : geometry.getMaterial();
         }
 
+        /**
+         * Checks whether this intersection is equal to another object.
+         * Equality is based on both the geometry and the intersection point.
+         *
+         * @param obj the object to compare with
+         * @return true if the object is an Intersection with the same geometry and point; false otherwise
+         */
         @Override
         public boolean equals(Object obj) {
             if (this == obj) return true;
@@ -68,6 +75,12 @@ public abstract class Intersectable {
             return geometry == other.geometry && Objects.equals(point, other.point);
         }
 
+        /**
+         * Returns a string representation of the Intersection object.
+         * Includes the geometry and the intersection point.
+         *
+         * @return a string describing this intersection
+         */
         @Override
         public String toString() {
             return "Intersection{" +

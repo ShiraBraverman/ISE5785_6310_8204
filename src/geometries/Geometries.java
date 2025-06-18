@@ -48,6 +48,12 @@ public class Geometries extends Intersectable {
         }
     }
 
+    /**
+     * Finds the intersections between the given ray and all geometries in the collection.
+     *
+     * @param ray The ray to check for intersections.
+     * @return A list of intersection points found across all geometries; or null if none are found.
+     */
     @Override
     public List<Intersection> calculateIntersectionsHelper(Ray ray) {
         List<Intersection> result = null;
