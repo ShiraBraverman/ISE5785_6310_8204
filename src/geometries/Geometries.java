@@ -6,8 +6,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import static primitives.Util.isZero;
-
 /**
  * Geometries class represents a collection (aggregate) of multiple geometric objects.
  * This class follows the Composite design pattern, allowing multiple geometries to be treated as one.
@@ -48,12 +46,20 @@ public class Geometries extends Intersectable {
         }
     }
 
+    /**
+     * Calculates intersections of a ray with all geometries in this collection,
+     * limited by a maximum distance.
+     *
+     * @param ray         the ray to intersect
+     * @param maxDistance the maximum distance for intersections to consider
+     * @return list of intersections within maxDistance, or null if none
+     */
     @Override
-    public List<Intersection> calculateIntersectionsHelper(Ray ray) {
+    public List<Intersection> calculateIntersectionsHelper(Ray ray, double maxDistance) {
         List<Intersection> result = null;
 
         for (Intersectable geo : geometries) {
-            List<Intersection> intersections = geo.calculateIntersections(ray);
+            List<Intersection> intersections = geo.calculateIntersections(ray, maxDistance);
             if (intersections != null && !intersections.isEmpty()) {
                 if (result == null) {
                     result = new LinkedList<>();

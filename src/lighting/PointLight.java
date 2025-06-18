@@ -46,6 +46,11 @@ public class PointLight extends Light implements LightSource {
         this.kL = kL;
         return this;
     }
+    @Override
+    public double getDistance(Point p) {
+        return position.distance(p);
+    }
+
 
     /**
      * Sets the quadratic attenuation factor.

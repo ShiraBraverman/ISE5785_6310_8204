@@ -14,7 +14,7 @@ public class Scene {
     public Color background = Color.BLACK;
     public AmbientLight ambientLight = AmbientLight.NONE;
     public Geometries geometries = new Geometries();  // הנחה: יש מחלקה Geometries עם בנאי ברירת מחדל
-    private List<LightSource> lights = new LinkedList<>();
+    public List<LightSource> lights = new LinkedList<>();
 
     // בנאי המקבל רק את שם הסצנה
     public Scene(String name) {

@@ -28,15 +28,6 @@ public class Tube extends RadialGeometry {
         this.axisRay = axisRay;
     }
 
-    /**
-     * Returns the normal vector of the tube at a given point.
-     * The normal is calculated by projecting the point onto the axis,
-     * finding the closest point on the axis, and then calculating the vector
-     * from that point to the given point.
-     *
-     * @param point The point on the surface of the tube
-     * @return The normal vector to the tube at the given point
-     */
     @Override
     public Vector getNormal(Point point) {
         Point p0 = axisRay.getOrigin();
@@ -44,8 +35,7 @@ public class Tube extends RadialGeometry {
 
         Vector p0ToPoint = point.subtract(p0);
         double t = p0ToPoint.dotProduct(v);
-
-        Point o = p0.add(v.scale(t)); // Closest point on the axis
+        Point o = p0.add(v.scale(t));
 
         Vector normal = point.subtract(o);
         if (normal.length() == 0) {
@@ -55,25 +45,20 @@ public class Tube extends RadialGeometry {
         return normal.normalize();
     }
 
-    /**
-     * Returns the axis ray of the tube.
-     *
-     * @return The axis ray.
-     */
     public Ray getAxisRay() {
         return axisRay;
     }
 
     /**
-     * Finds the intersections between the tube and a given ray.
-     * The intersections are calculated by solving the quadratic equation
-     * that arises from the ray's parametric equation and the tube's equation.
+     * Finds the intersections between the tube and a given ray,
+     * limited by the given maxDistance.
      *
-     * @param ray The ray to check for intersections.
-     * @return A list of intersection points, or null if there are no intersections.
+     * @param ray         The ray to check for intersections.
+     * @param maxDistance The maximum allowed distance from the ray origin.
+     * @return A list of intersection points within maxDistance, or null if none.
      */
     @Override
-    protected List<Intersectable.Intersection> calculateIntersectionsHelper(Ray ray) {
+    protected List<Intersectable.Intersection> calculateIntersectionsHelper(Ray ray, double maxDistance) {
         List<Intersectable.Intersection> intersections = new ArrayList<>();
 
         Vector vAxis = axisRay.getDirection();
@@ -131,11 +116,15 @@ public class Tube extends RadialGeometry {
 
         if (t1 > 0) {
             Point p1 = ray.getPoint(t1);
-            intersections.add(new Intersectable.Intersection(this, p1));
+            if (ray.getOrigin().distance(p1) <= maxDistance) {
+                intersections.add(new Intersectable.Intersection(this, p1));
+            }
         }
         if (t2 > 0 && !isZero(t1 - t2)) {
             Point p2 = ray.getPoint(t2);
-            intersections.add(new Intersectable.Intersection(this, p2));
+            if (ray.getOrigin().distance(p2) <= maxDistance) {
+                intersections.add(new Intersectable.Intersection(this, p2));
+            }
         }
 
         return intersections.isEmpty() ? null : intersections;

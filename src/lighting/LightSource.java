@@ -23,4 +23,12 @@ public interface LightSource {
      * @return the direction vector (normalized)
      */
     Vector getL(Point p);
+
+    /**
+     * Returns the distance from the light source to the given point.
+     *
+     * @param p the point
+     * @return the distance between the light source and the point
+     */
+    double getDistance(Point p); // ← הוספת מתודה זו פותרת את השגיאה
 }

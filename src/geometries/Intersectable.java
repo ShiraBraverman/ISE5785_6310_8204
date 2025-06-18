@@ -18,42 +18,17 @@ public abstract class Intersectable {
      * which helps in improving rendering efficiency and clarity.
      */
     public static class Intersection {
-        // The geometry that was intersected
         public final Geometry geometry;
-
-        // The intersection point on the geometry
         public final Point point;
-
-        // The material of the geometry at the point of intersection (final - initialized in constructor)
         public final Material material;
 
-        // --- Cached fields for lighting calculations ---
-
-        // The ray that caused this intersection
         public Vector rayDir;
-
-        // The normal vector at the intersection point on the geometry
         public Vector normal;
-
-        // Dot product of ray direction and the normal vector
         public Double nv;
-
-        // The light source currently being processed for this intersection
         public LightSource lightSource;
-
-        // Vector from the light source to the intersection point
         public Vector l;
-
-        // Dot product of light direction and normal vector
         public Double nl;
 
-        /**
-         * Constructor for creating an Intersection object with the associated geometry and point.
-         * Initializes the material if geometry is not null.
-         *
-         * @param geometry the intersected geometry
-         * @param point    the intersection point on the geometry
-         */
         public Intersection(Geometry geometry, Point point) {
             this.geometry = geometry;
             this.point = point;
@@ -85,16 +60,29 @@ public abstract class Intersectable {
      * @return List of intersection objects, or null if none found
      */
     public final List<Intersection> calculateIntersections(Ray ray) {
-        return calculateIntersectionsHelper(ray);
+        // Default maxDistance is positive infinity
+        return calculateIntersections(ray, Double.POSITIVE_INFINITY);
+    }
+
+    /**
+     * New overloaded method to calculate intersections with a max distance limit.
+     *
+     * @param ray The ray to check for intersections
+     * @param maxDistance The maximal distance to consider intersections
+     * @return List of intersection objects, or null if none found
+     */
+    public final List<Intersection> calculateIntersections(Ray ray, double maxDistance) {
+        return calculateIntersectionsHelper(ray, maxDistance);
     }
 
     /**
      * Abstract helper method to be implemented by each geometry type.
      *
      * @param ray The ray to test for intersection
+     * @param maxDistance The maximal distance to consider intersections
      * @return List of intersection objects, or null if none found
      */
-    protected abstract List<Intersection> calculateIntersectionsHelper(Ray ray);
+    protected abstract List<Intersection> calculateIntersectionsHelper(Ray ray, double maxDistance);
 
     /**
      * Convenience method to return just the points of intersection without geometry info.

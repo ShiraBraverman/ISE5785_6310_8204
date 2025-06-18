@@ -32,4 +32,9 @@ public class DirectionalLight extends Light implements LightSource {
         // The direction FROM the light TO the point is opposite of the direction field
         return direction.scale(-1); // Returning vector FROM light TO point
     }
+    @Override
+    public double getDistance(Point p) {
+        return Double.POSITIVE_INFINITY;
+    }
+
 }

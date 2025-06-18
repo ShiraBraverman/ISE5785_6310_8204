@@ -38,12 +38,13 @@ public abstract class RadialGeometry extends Geometry {
     }
 
     /**
-     * Finds the intersection points of the geometry with a given ray.
-     * This method needs to be implemented in the specific subclasses (e.g., Sphere, Cylinder).
+     * Finds the intersection points of the geometry with a given ray,
+     * limited to points within maxDistance.
      *
      * @param ray The ray to check for intersections.
-     * @return A list of points where the ray intersects the geometry, or null if no intersection.
+     * @param maxDistance The maximum allowed distance for intersections.
+     * @return A list of intersection points or null if none.
      */
     @Override
-    protected abstract List<Intersectable.Intersection> calculateIntersectionsHelper(Ray ray);
+    protected abstract List<Intersectable.Intersection> calculateIntersectionsHelper(Ray ray, double maxDistance);
 }
