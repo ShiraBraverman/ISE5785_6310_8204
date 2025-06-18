@@ -111,6 +111,12 @@ public class Color {
         return new Color(rgb.reduce(k));
     }
 
+    /**
+     * Returns a string representation of the color in the format "rgb:[r, g, b]".
+     * Useful for debugging or logging purposes.
+     *
+     * @return string representation of the RGB values
+     */
     @Override
     public String toString() { return "rgb:" + rgb; }
 }
