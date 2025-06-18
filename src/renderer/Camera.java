@@ -216,7 +216,7 @@ public class Camera implements Cloneable {
          */
         public Builder setRayTracer(Scene scene, RayTracerType rayTracerType) {
             if (rayTracerType == RayTracerType.SIMPLE) {
-                camera.rayTracer = new SimpleRayTracer(scene);
+                camera.rayTracer = new SimpleRayTracer(scene, RayTracerType.SIMPLE);
             } else {
                 camera.rayTracer = null;
             }
@@ -240,7 +240,7 @@ public class Camera implements Cloneable {
             camera.imageWriter = new ImageWriter(camera.nX, camera.nY);
 
             if (camera.rayTracer == null) {
-                camera.rayTracer = new SimpleRayTracer(null); // Empty scene
+                camera.rayTracer = new SimpleRayTracer(null,RayTracerType.SIMPLE);
             }
 
             camera.vRight = (camera.vTo.crossProduct(camera.vUp)).normalize();

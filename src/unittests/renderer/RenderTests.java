@@ -30,7 +30,7 @@ class RenderTests {
     @Test
     void renderTwoColorTest() {
         Scene scene = new Scene("Two color").setBackground(new Color(75, 127, 90))
-                .setAmbientLight(new AmbientLight(new Color(255, 191, 191)));
+                .setAmbientLight(new AmbientLight(new Color(255, 191, 191), 1.0));
         scene.geometries
                 .add(
                         new Sphere(new Point(0, 0, -100), 50d),
@@ -54,7 +54,7 @@ class RenderTests {
     void renderMaterialColorTest() {
         Scene scene = new Scene("Material color")
                 .setBackground(Color.BLACK)
-                .setAmbientLight(new AmbientLight(new Color(WHITE)));
+                .setAmbientLight(new AmbientLight(new Color(WHITE), 1.0));
 
         scene.geometries
                 .add(
@@ -81,7 +81,7 @@ class RenderTests {
      */
     @Test
     void renderMultiColorTest() {
-        Scene scene = new Scene("Multi color").setAmbientLight(new AmbientLight(new Color(51, 51, 51)));
+        Scene scene = new Scene("Multi color").setAmbientLight(new AmbientLight(new Color(51, 51, 51), 1.0));
         scene.geometries
                 .add(
                         new Sphere(new Point(0, 0, -100), 50),
