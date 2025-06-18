@@ -17,6 +17,7 @@ class ShadowTests {
     /** Default constructor to satisfy JavaDoc generator */
     ShadowTests() { /* to satisfy JavaDoc generator */ }
 
+
     /** Scene of the tests */
     private final Scene scene = new Scene("Test scene");
 
