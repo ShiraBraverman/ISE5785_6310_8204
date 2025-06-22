@@ -112,6 +112,10 @@ public record Double3(double d1, double d2, double d3) {
    public Double3 reduce(double rhs) {
       return new Double3(d1 / rhs, d2 / rhs, d3 / rhs);
    }
+   public double getAverage() {
+      return (d1 + d2 + d3) / 3.0;
+   }
+
 
    /**
     * Product two floating point triads into a new triad where each couple of

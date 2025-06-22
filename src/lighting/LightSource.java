@@ -23,4 +23,6 @@ public interface LightSource {
      * @return the direction vector (normalized)
      */
     Vector getL(Point p);
+    double getDistance(Point point);
+
 }

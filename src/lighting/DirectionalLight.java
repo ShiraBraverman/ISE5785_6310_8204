@@ -44,4 +44,8 @@ public class DirectionalLight extends Light implements LightSource {
     public Vector getL(Point p) {
         return direction.scale(-1);
     }
+    @Override
+    public double getDistance(Point point) {
+        return Double.POSITIVE_INFINITY; // אור כיווני נחשב ללא נקודת מקור ספציפית
+    }
 }

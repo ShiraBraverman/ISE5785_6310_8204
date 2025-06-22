@@ -8,7 +8,7 @@ import primitives.Vector;
  * Class representing a point light source.
  */
 public class PointLight extends Light implements LightSource {
-    private final Point position;
+    public final Point position;
 
     private double kC = 1;
     private double kL = 0;
@@ -45,6 +45,10 @@ public class PointLight extends Light implements LightSource {
     public PointLight setKL(double kL) {
         this.kL = kL;
         return this;
+    }
+    @Override
+    public double getDistance(Point point) {
+        return position.distance(point);
     }
 
     /**

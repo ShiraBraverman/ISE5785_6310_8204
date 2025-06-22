@@ -37,6 +37,8 @@ public class Material {
      * Shininess factor (nShininess) – controls the size of the specular highlight.
      */
     public int nShininess = 0;
+    public Double3 kT = Double3.ZERO; // שקיפות
+
 
     /**
      * Default constructor.
@@ -87,6 +89,15 @@ public class Material {
      */
     public Material setKs(double kS) {
         this.kS = new Double3(kS);
+        return this;
+    }
+    public Material setKt(Double3 kT) {
+        this.kT = kT;
+        return this;
+    }
+
+    public Material setKt(double kT) {
+        this.kT = new Double3(kT);
         return this;
     }
 

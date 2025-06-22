@@ -36,7 +36,7 @@ public class Scene {
     /**
      * The list of light sources in the scene.
      */
-    private List<LightSource> lights = new LinkedList<>();
+    public List<LightSource> lights = new LinkedList<>();
 
     /**
      * Constructor that initializes the scene with a given name.

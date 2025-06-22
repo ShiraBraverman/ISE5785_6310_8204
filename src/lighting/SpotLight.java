@@ -78,6 +78,10 @@ public class SpotLight extends PointLight {
         super.setKC(kC);
         return this;
     }
+    @Override
+    public double getDistance(Point point) {
+        return position.distance(point);
+    }
 
     /**
      * Sets the linear attenuation factor.
