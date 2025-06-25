@@ -118,7 +118,19 @@ public class Polygon extends Geometry {
 
       Vector v1 = vertices.get(vertices.size() - 1).subtract(point);
       Vector v2 = vertices.get(0).subtract(point);
-      Vector cross = v1.crossProduct(v2);
+
+      // בדיקה מוקדמת של וקטורים אפסיים
+      if (v1.length() == 0 || v2.length() == 0) {
+         return true; // הנקודה על קדקוד
+      }
+
+      Vector cross;
+      try {
+         cross = v1.crossProduct(v2);
+      } catch (IllegalArgumentException e) {
+         return false; // וקטורים מקבילים
+      }
+
       double sign = alignZero(n.dotProduct(cross));
 
       if (isZero(sign)) {
@@ -130,13 +142,16 @@ public class Polygon extends Geometry {
       for (int i = 1; i < vertices.size(); ++i) {
          v1 = v2;
          v2 = vertices.get(i).subtract(point);
+
+         // בדיקה מוקדמת של וקטורים אפסיים
          if (v1.length() == 0 || v2.length() == 0) {
-            return true;
+            return true; // הנקודה על קדקוד
          }
+
          try {
             cross = v1.crossProduct(v2);
          } catch (IllegalArgumentException e) {
-            return false;
+            return false; // וקטורים מקבילים
          }
 
          if (isZero(cross.length())) {

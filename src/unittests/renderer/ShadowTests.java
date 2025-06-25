@@ -99,13 +99,15 @@ class ShadowTests {
                         new Point(-150, -150, -115),
                         new Point(150, -150, -135),
                         new Point(75, 75, -150))
-                        .setMaterial(new Material().setKs(0.8).setShininess(60)),
+                        .setEmission(new Color(20, 20, 20)) // צבע בסיס אפור כהה
+                        .setMaterial(new Material().setKd(0.5).setKs(0.8).setShininess(60)), // הוספת kD
 
                 new Triangle(
                         new Point(-150, -150, -115),
                         new Point(-70, 70, -140),
                         new Point(75, 75, -150))
-                        .setMaterial(new Material().setKs(0.8).setShininess(60)),
+                        .setEmission(new Color(20, 20, 20)) // צבע בסיס אפור כהה
+                        .setMaterial(new Material().setKd(0.5).setKs(0.8).setShininess(60)), // הוספת kD
 
                 new Sphere(new Point(0, 0, -11), 30d)
                         .setEmission(new Color(BLUE))
@@ -125,5 +127,79 @@ class ShadowTests {
                 .writeToImage("shadowTrianglesSphere");
     }
 
+    @Test
+    void debugSimpleShadowTest() {
+        scene.lights.clear();
+
+        // ריבוע שטוח על ציר Z
+        Triangle floor = new Triangle(
+                new Point(-100, -100, 0),
+                new Point(100, -100, 0),
+                new Point(0, 100, 0)
+        );
+        floor.setEmission(new Color(100, 100, 100));
+        floor.setMaterial(new Material().setKd(0.5).setKs(0.5).setShininess(30));
+
+
+        // כדור באוויר מעל הריבוע
+        Sphere ball = new Sphere(new Point(0, 0, 50), 30d);
+        ball.setEmission(new Color(0, 0, 255));
+        ball.setMaterial(new Material().setKd(0.5).setKs(0.5).setShininess(30));
+
+        // 👇 הוספה בשתי שורות
+        scene.geometries.add(floor);
+        scene.geometries.add(ball);
+
+        // אור שמכוון מהצד (כדי שייצר צל)
+        scene.lights.add(new SpotLight(new Color(500, 300, 0),
+                new Point(100, 100, 100), // מיקום האור
+                new Vector(-1, -1, -1))   // כיוון הקרן
+                .setKL(1E-5).setKQ(1.5E-7));
+
+        // אור אמביאנט חלש כדי שלא "ישטוף" הכל
+        scene.setAmbientLight(new AmbientLight(new Color(20, 20, 20)));
+
+        camera
+                .setResolution(300, 300)
+                .build()
+                .renderImage()
+                .writeToImage("debugSimpleShadowTest");
+    }
+
+
+    @Test
+    void simpleShadowDebugTest() {
+        scene.lights.clear();
+
+        // ריבוע שטוח
+        Triangle floor = new Triangle(
+                new Point(-50, -50, 0),
+                new Point(50, -50, 0),
+                new Point(0, 50, 0)
+        );
+        floor.setEmission(new Color(100, 100, 100));
+        floor.setMaterial(new Material().setKd(0.5).setKs(0.5).setShininess(30));
+
+        // כדור מעל הריבוע
+        Sphere ball = new Sphere(new Point(0, 0, 50), 20d);
+        ball.setEmission(new Color(0, 0, 255));
+        ball.setMaterial(new Material().setKd(0.5).setKs(0.5).setShininess(30));
+
+        scene.geometries.add(floor, ball);
+
+        // אור שמגיע מהכיוון (100, 100, 100)
+        scene.lights.add(new SpotLight(new Color(500, 300, 0),
+                new Point(100, 100, 100),
+                new Vector(-1, -1, -1))
+                .setKL(1E-5).setKQ(1.5E-7));
+
+        scene.setAmbientLight(new AmbientLight(new Color(20, 20, 20)));
+
+        camera
+                .setResolution(300, 300)
+                .build()
+                .renderImage()
+                .writeToImage("simpleShadowDebugTest");
+    }
 
 }

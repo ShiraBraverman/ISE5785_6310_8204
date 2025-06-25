@@ -61,25 +61,30 @@ public class SimpleRayTracer extends RayTracerBase {
         return color;
     }
 
-    private boolean unshaded(Intersection intersection, LightSource lightSource, Vector l, Vector n, double nl) {
-        Vector lightDirection = l.scale(-1);
-        Vector epsVector = n.scale(nl < 0 ? DELTA : -DELTA);
+    private boolean unshaded(Intersection intersection, LightSource lightSource) {
+        Vector lightDirection = intersection.l.normalize();
+        Vector epsVector = intersection.normal.scale(intersection.nl < 0 ? DELTA : -DELTA);
         Point newPoint = intersection.point.add(epsVector);
         Ray shadowRay = new Ray(newPoint, lightDirection);
+
         List<Intersection> intersections = scene.geometries.calculateIntersectionsHelper(shadowRay);
-
-        if (intersections == null) return true;
-
         double lightDistance = lightSource.getDistance(intersection.point);
 
-        for (Intersection inter : intersections) {
-            if (inter.geometry == intersection.geometry)
-                continue;
+        if (intersections == null) {
+            return true;
+        }
 
-            if (alignZero(inter.point.distance(intersection.point) - lightDistance) <= 0) {
-                if (inter.geometry.getMaterial().kT.lowerThan(MIN_CALC_COLOR_K)) {
-                    return false;
-                }
+        for (Intersection inter : intersections) {
+            if (inter.geometry == intersection.geometry) continue;
+
+            double interDist = inter.point.distance(intersection.point);
+            double transparency = inter.material != null ? inter.material.kT.getAverage() : 0;
+
+            System.out.printf("[SHADOW] Intersection with %s at distance %.2f, light distance %.2f, transparency %.2f%n",
+                    inter.geometry.getClass().getSimpleName(), interDist, lightDistance, transparency);
+
+            if (interDist <= lightDistance && transparency <= 0) {
+                return false;
             }
         }
 
@@ -124,20 +129,13 @@ public class SimpleRayTracer extends RayTracerBase {
         Material material = intersection.material;
 
         for (LightSource lightSource : scene.lights) {
-            Vector l = lightSource.getL(intersection.point);
-            double nl = alignZero(n.dotProduct(l));
-
-            if (nl * nv <= 0) {
-                continue;
-            }
-
-            if (!unshaded(intersection, lightSource, l, n, nl)) {
-                continue;
-            }
+            if (!setLightSource(intersection, lightSource)) continue;
+            if (!unshaded(intersection, lightSource)) continue;
 
             Color intensity = lightSource.getIntensity(intersection.point);
-            Color diffusive = calcDiffusive(material.kD, l, n, intensity);
-            Color specular = calcSpecular(material.kS, l, n, v, material.nShininess, intensity);
+            Color diffusive = calcDiffusive(material.kD, intersection.l, intersection.normal, intensity);
+            Color specular = calcSpecular(material.kS, intersection.l, intersection.normal,
+                    intersection.rayDir, material.nShininess, intensity);
             localColor = localColor.add(diffusive).add(specular);
         }
 
