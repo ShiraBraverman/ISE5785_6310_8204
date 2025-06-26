@@ -9,6 +9,8 @@ import geometries.Intersectable.Intersection;
  * The Ray is used to represent an infinite line starting from a point in a specified direction.
  */
 public class Ray {
+    private static final double DELTA = 0.1;
+
 
     /**
      * The origin point of the ray (where the ray starts).
@@ -36,6 +38,14 @@ public class Ray {
         this.origin = origin;
         this.direction = direction.normalize();  // Normalize the vector to ensure it is a unit vector
     }
+    public Ray(Point point, Vector direction, Vector normal) {
+        // הזזה קטנה לאורך הנורמל כדי למנוע חיתוך עצמי
+        double sign = direction.dotProduct(normal) > 0 ? DELTA : -DELTA;
+        Vector delta = normal.scale(sign);
+        this.origin = point.add(delta);
+        this.direction = direction.normalize();
+    }
+
 
     /**
      * Returns the origin of the ray.

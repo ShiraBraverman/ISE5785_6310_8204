@@ -34,6 +34,9 @@ public abstract class Intersectable {
 
         // The normal vector at the intersection point on the geometry
         public Vector normal;
+        // Dot product of ray direction and the normal vector
+        public Double vNormal;
+
 
         // Dot product of ray direction and the normal vector
         public Double nv;
