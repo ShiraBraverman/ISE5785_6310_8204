@@ -26,6 +26,40 @@ public class SimpleRayTracer extends RayTracerBase {
             return scene.background;
         return calcColor(intersection, ray);
     }
+    /**
+     * Computes how much light is transmitted from the light source to the intersection point,
+     * considering partial transparency of occluding geometries.
+     *
+     * @param intersection the intersection point
+     * @return the transparency coefficient (1.0 = fully transparent, 0.0 = fully blocked)
+     */
+    private Double3 transparency(Intersection intersection) {
+        Vector lightDirection = intersection.l;
+        Vector epsVector = intersection.normal.scale(intersection.nl < 0 ? DELTA : -DELTA);
+        Point newPoint = intersection.point.add(epsVector);
+        Ray shadowRay = new Ray(newPoint, lightDirection);
+
+        double lightDistance = intersection.lightSource.getDistance(intersection.point);
+        List<Intersection> intersections = scene.geometries.calculateIntersectionsHelper(shadowRay);
+
+        if (intersections == null) return Double3.ONE;
+
+        Double3 ktr = Double3.ONE;
+        for (Intersection inter : intersections) {
+            if (inter.geometry == intersection.geometry) continue;
+
+            double dist = inter.point.distance(intersection.point);
+            if (alignZero(dist - lightDistance) <= 0) {
+                ktr = ktr.product(inter.material.kT);
+                if (ktr.lowerThan(MIN_CALC_COLOR_K)) {
+                    return Double3.ZERO; // חסימה כמעט מלאה
+                }
+            }
+        }
+
+        return ktr;
+    }
+
 
     private Color calcColor(Intersection intersection, Ray ray) {
         return calcColor(intersection, ray, MAX_CALC_COLOR_LEVEL, INITIAL_K);
@@ -74,9 +108,11 @@ public class SimpleRayTracer extends RayTracerBase {
 
         for (LightSource lightSource : scene.lights) {
             if (!setLightSource(intersection, lightSource)) continue;
-            if (!unshaded(intersection, lightSource)) continue;
 
-            Color intensity = lightSource.getIntensity(intersection.point);
+            Double3 ktr = transparency(intersection);
+            if (ktr.lowerThan(MIN_CALC_COLOR_K)) continue;
+
+            Color intensity = lightSource.getIntensity(intersection.point).scale(ktr);
 
             Color diffusive = calcDiffusive(material.kD, intersection.l, intersection.normal, intensity);
             Color specular = calcSpecular(material.kS, intersection.l, intersection.normal,
@@ -87,28 +123,6 @@ public class SimpleRayTracer extends RayTracerBase {
 
         return color;
     }
-
-    private boolean unshaded(Intersection intersection, LightSource lightSource) {
-        Vector lightDirection = intersection.l;
-        Vector epsVector = intersection.normal.scale(intersection.nl < 0 ? DELTA : -DELTA);
-        Point newPoint = intersection.point.add(epsVector);
-        Ray shadowRay = new Ray(newPoint, lightDirection);
-        List<Intersection> intersections = scene.geometries.calculateIntersectionsHelper(shadowRay);
-        double lightDistance = lightSource.getDistance(intersection.point);
-
-        if (intersections == null) return true;
-
-        for (Intersection inter : intersections) {
-            if (inter.geometry == intersection.geometry) continue;
-            double dist = inter.point.distance(intersection.point);
-            if (alignZero(dist - lightDistance) <= 0 && inter.material.kT.lowerThan(MIN_CALC_COLOR_K)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     private Color calcSpecular(Double3 ks, Vector l, Vector n, Vector v, double nShininess, Color iL) {
         Vector r = l.subtract(n.scale(2 * l.dotProduct(n))).normalize();
         double max = Math.max(0, r.dotProduct(v)); // נקודת highlight תלויה בזה!
