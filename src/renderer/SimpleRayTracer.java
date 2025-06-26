@@ -22,7 +22,8 @@ public class SimpleRayTracer extends RayTracerBase {
     @Override
     public Color traceRay(Ray ray) {
         Intersection intersection = findClosestIntersection(ray);
-        if (intersection == null) return scene.background;
+        if (intersection == null)
+            return scene.background;
         return calcColor(intersection, ray);
     }
 
@@ -46,41 +47,45 @@ public class SimpleRayTracer extends RayTracerBase {
         return localColor.add(globalColor);
     }
 
-    private Color calcColorLocalEffects(Intersection intersection) {
-        Color color = intersection.geometry.getEmission();
-        for (LightSource lightSource : scene.lights) {
-            if (!setLightSource(intersection, lightSource)) continue;
-            if (!unshaded(intersection, lightSource)) continue;
-
-            Color intensity = lightSource.getIntensity(intersection.point);
-            Material material = intersection.material;
-
-            color = color.add(calcDiffusive(material.kD, intersection.l, intersection.normal, intensity))
-                    .add(calcSpecular(material.kS, intersection.l, intersection.normal,
-                            intersection.rayDir, material.nShininess, intensity));
-        }
-        return color;
-    }
-
-    private boolean preprocessIntersection(Intersection intersection, Vector v) {
-        intersection.rayDir = v;
+    private boolean preprocessIntersection(Intersection intersection, Vector rayDir) {
+        intersection.rayDir = rayDir; // היה scale(-1)
         Vector n = intersection.geometry.getNormal(intersection.point);
-        double nv = alignZero(n.dotProduct(v));
+        double nv = alignZero(n.dotProduct(rayDir));
         if (nv > 0) {
             n = n.scale(-1);
             nv = -nv;
         }
-        n = n.normalize();
-        intersection.normal = n;
+        intersection.normal = n.normalize();
         intersection.vNormal = nv;
         return !isZero(nv);
     }
+
 
     public boolean setLightSource(Intersection intersection, LightSource lightSource) {
         intersection.lightSource = lightSource;
         intersection.l = lightSource.getL(intersection.point).normalize();
         intersection.nl = alignZero(intersection.l.dotProduct(intersection.normal));
-        return intersection.nl  > 0;
+        return intersection.nl > 0;
+    }
+
+    private Color calcColorLocalEffects(Intersection intersection) {
+        Color color = intersection.geometry.getEmission();
+        Material material = intersection.material;
+
+        for (LightSource lightSource : scene.lights) {
+            if (!setLightSource(intersection, lightSource)) continue;
+            if (!unshaded(intersection, lightSource)) continue;
+
+            Color intensity = lightSource.getIntensity(intersection.point);
+
+            Color diffusive = calcDiffusive(material.kD, intersection.l, intersection.normal, intensity);
+            Color specular = calcSpecular(material.kS, intersection.l, intersection.normal,
+                    intersection.rayDir, material.nShininess, intensity);
+
+            color = color.add(diffusive).add(specular);
+        }
+
+        return color;
     }
 
     private boolean unshaded(Intersection intersection, LightSource lightSource) {
@@ -100,7 +105,18 @@ public class SimpleRayTracer extends RayTracerBase {
                 return false;
             }
         }
+
         return true;
+    }
+
+    private Color calcSpecular(Double3 ks, Vector l, Vector n, Vector v, double nShininess, Color iL) {
+        Vector r = l.subtract(n.scale(2 * l.dotProduct(n))).normalize();
+        double max = Math.max(0, r.dotProduct(v)); // נקודת highlight תלויה בזה!
+        return iL.scale(ks.scale(Math.pow(max, nShininess)));
+    }
+
+    private Color calcDiffusive(Double3 kd, Vector l, Vector n, Color iL) {
+        return iL.scale(kd.scale(Math.abs(l.normalize().dotProduct(n.normalize()))));
     }
 
     private Ray constructReflectedRay(Intersection intersection) {
@@ -113,13 +129,11 @@ public class SimpleRayTracer extends RayTracerBase {
         return new Ray(newPoint, r, n);
     }
 
-
     private Ray constructRefractedRay(Intersection intersection) {
         Vector delta = intersection.normal.scale(intersection.vNormal < 0 ? DELTA : -DELTA);
         Point newPoint = intersection.point.add(delta);
         return new Ray(newPoint, intersection.rayDir, intersection.normal);
     }
-
 
     private Color calcGlobalEffects(Intersection intersection, int level, Double3 k) {
         Double3 kR = intersection.material.kR;
@@ -155,15 +169,5 @@ public class SimpleRayTracer extends RayTracerBase {
         List<Intersection> intersections = scene.geometries.calculateIntersectionsHelper(ray);
         if (intersections == null || intersections.isEmpty()) return null;
         return ray.findClosestIntersection(intersections);
-    }
-
-    private Color calcSpecular(Double3 ks, Vector l, Vector n, Vector v, double nShininess, Color iL) {
-        Vector r = l.subtract(n.scale(l.dotProduct(n)).scale(2)).normalize();
-        double max = Math.max(0, -v.dotProduct(r));
-        return iL.scale(ks.scale(Math.pow(max, nShininess)));
-    }
-
-    private Color calcDiffusive(Double3 kd, Vector l, Vector n, Color iL) {
-        return iL.scale(kd.scale(Math.abs(l.normalize().dotProduct(n.normalize()))));
     }
 }
