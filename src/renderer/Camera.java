@@ -11,6 +11,8 @@ import renderer.RayTracerBase;
 import renderer.RayTracerType;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.MissingResourceException;
 
 import static primitives.Util.alignZero;
@@ -21,7 +23,8 @@ import static primitives.Util.isZero;
  * defining its position, orientation, and the view plane properties.
  */
 public class Camera implements Cloneable {
-
+    private boolean antiAliasing = false; // ברירת מחדל כבוי
+    private int samples = 1; // כמות קרניים לאנטי-אייסינג
     private Point p0;
     private Vector vTo, vUp, vRight;
     private double width = 0.0, height = 0.0, distance = 0.0;
@@ -81,9 +84,18 @@ public class Camera implements Cloneable {
 
         for (int i = 0; i < nY; i++) {
             for (int j = 0; j < nX; j++) {
-                Ray ray = constructRay(nX, nY, j, i);
-                Color color = rayTracer.traceRay(ray);
-                imageWriter.writePixel(j, i, color);
+                Color finalColor = Color.BLACK;
+                if (antiAliasing) {
+                    List<Ray> rays = constructAARays(nX, nY, j, i);
+                    for (Ray ray : rays) {
+                        finalColor = finalColor.add(rayTracer.traceRay(ray));
+                    }
+                    finalColor = finalColor.scale(1.0 / rays.size());
+                } else {
+                    Ray ray = constructRay(nX, nY, j, i);
+                    finalColor = rayTracer.traceRay(ray);
+                }
+                imageWriter.writePixel(j, i, finalColor);
             }
         }
         return this;
@@ -223,6 +235,12 @@ public class Camera implements Cloneable {
             return this;
         }
 
+        public Builder enableAntiAliasing(int samples) {
+            camera.antiAliasing = true;
+            camera.samples = samples;
+            return this;
+        }
+
         public Camera build() {
             final String description = "Missing rendering data";
             final String className = "Camera";
@@ -263,5 +281,31 @@ public class Camera implements Cloneable {
                 throw new RuntimeException(exception);
             }
         }
+    }
+
+    private List<Ray> constructAARays(int nX, int nY, int j, int i) {
+        List<Ray> rays = new ArrayList<>();
+        double Ry = height / nY;
+        double Rx = width / nX;
+
+        double Yi = -(i - (nY - 1) / 2d) * Ry;
+        double Xj = (j - (nX - 1) / 2d) * Rx;
+
+        double subRx = Rx / Math.sqrt(samples);
+        double subRy = Ry / Math.sqrt(samples);
+
+        for (int row = 0; row < Math.sqrt(samples); row++) {
+            for (int col = 0; col < Math.sqrt(samples); col++) {
+                double xShift = Xj + (col + 0.5 - Math.sqrt(samples) / 2) * subRx;
+                double yShift = Yi + (row + 0.5 - Math.sqrt(samples) / 2) * subRy;
+
+                Point pIJ = p0.add(vTo.scale(distance));
+                if (!isZero(xShift)) pIJ = pIJ.add(vRight.scale(xShift));
+                if (!isZero(yShift)) pIJ = pIJ.add(vUp.scale(yShift));
+
+                rays.add(new Ray(p0, pIJ.subtract(p0).normalize()));
+            }
+        }
+        return rays;
     }
 }
