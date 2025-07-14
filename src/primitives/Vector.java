@@ -65,9 +65,16 @@ public class Vector extends Point {
      * @return A new Vector representing the scaled vector
      */
     public Vector scale(Double scalar) {
+        if (primitives.Util.isZero(scalar)) {
+            return this;
+        }
         return new Vector(coordinates.scale(scalar));
     }
-    public Vector scale(int scalar) { return scale((double) scalar);}
+    public Vector scale(int scalar) {
+        if (primitives.Util.isZero(scalar)) {
+        return this;
+    }
+    return scale((double) scalar);}
     /**
      * Calculates the dot product (scalar product) of the current vector and another vector.
      * The dot product is a measure of the vectors' similarity in direction.

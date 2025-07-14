@@ -99,7 +99,8 @@ public record Double3(double d1, double d2, double d3) {
     * @return result of scale
     */
    public Double3 scale(double rhs) {
-      return new Double3(d1 * rhs, d2 * rhs, d3 * rhs);
+      Double3 result = new Double3(d1 * rhs, d2 * rhs, d3 * rhs);
+      return result;
    }
 
    /**

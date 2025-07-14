@@ -1,9 +1,9 @@
 package unittests.renderer;
 
-import static java.awt.Color.*;
-
 import geometries.*;
-import lighting.*;
+import lighting.AmbientLight;
+import lighting.PointLight;
+import lighting.SpotLight;
 import org.junit.jupiter.api.Test;
 import primitives.*;
 import renderer.Camera;
@@ -20,7 +20,7 @@ import scene.Scene;
  *
  * This test helps evaluate color vibrance, geometric distribution, and anti-aliasing smoothness.
  */
-public class AntiAliasingTest {
+public class AdaptiveAntiAliasingTest {
     java.util.Random rand = new java.util.Random(1234); // Seed for reproducible results
 
     /**
@@ -70,47 +70,54 @@ public class AntiAliasingTest {
         };
 
         // Add two flower sphere structures to the scene
-        addFlowerSpheres(scene, -50, 0, -30, 12, 30, coolColors);
-        addFlowerSpheres(scene, 50, 0, 30, 12, 30, coolColors);
+        addFlowerSpheres(scene, 50, 0, 30, 8, 20, coolColors);
 
-        // Define darker colors for crown triangles
-        Color[] colors = {
-                new Color(180, 0, 0),
-                new Color(0, 180, 0),
-                new Color(0, 0, 180),
-                new Color(180, 180, 0),
-                new Color(0, 180, 180),
-                new Color(180, 0, 180),
-                new Color(180, 110, 0),
-                new Color(90, 0, 90)
-        };
+        // Add two colorful angled triangles ("wing style") to the scene
+        scene.geometries.add(
+                new Triangle(
+                        new Point(-70, 20, -50),
+                        new Point(-30, 40, -40),
+                        new Point(-50, 20, -30)
+                )
+                        .setEmission(new Color(20, 180, 180)) // Turquoise
+                        .setMaterial(new Material().setKd(0.4).setKs(0.5).setShininess(200).setKr(0.15)),
 
-        // Add crown-style triangles around the scene
-        double crownRadius = 40;
-        double baseY = 110;
-        double tipY = 140;
-        double baseZ = -60;
-        double tipZ = -80;
-        double baseAngleWidth = Math.toRadians(40);
+                new Triangle(
+                        new Point(70, 20, -50),
+                        new Point(30, 40, -40),
+                        new Point(50, 20, -30)
+                )
+                        .setEmission(new Color(200, 60, 150)) // Pink-fuchsia
+                        .setMaterial(new Material().setKd(0.4).setKs(0.5).setShininess(200).setKr(0.15))
+        );
 
-        for (int i = 0; i < 8; i++) {
-            double centerAngle = Math.toRadians(i * 45);
-            double x1 = crownRadius * Math.cos(centerAngle - baseAngleWidth / 2);
-            double z1 = baseZ + crownRadius * Math.sin(centerAngle - baseAngleWidth / 2);
-            double x2 = crownRadius * Math.cos(centerAngle + baseAngleWidth / 2);
-            double z2 = baseZ + crownRadius * Math.sin(centerAngle + baseAngleWidth / 2);
-            double xMid = crownRadius * Math.cos(centerAngle);
-            double zMid = baseZ + crownRadius * Math.sin(centerAngle);
+        // Create materials for the cylinders
+        Material cylinderMaterial = new Material()
+                .setKd(0.4)
+                .setKs(0.5)
+                .setShininess(150)
+                .setKr(0.2);
 
-            scene.geometries.add(
-                    new Triangle(
-                            new Point(x1, baseY, z1),
-                            new Point(x2, baseY, z2),
-                            new Point(xMid, tipY, tipZ)
-                    ).setEmission(colors[i % colors.length])
-                            .setMaterial(new Material().setKd(0.4).setKs(0.4).setShininess(200))
-            );
-        }
+// Cylinder 1
+        Cylinder cylinder1 = new Cylinder(
+                10, // radius
+                60, // height
+                new Ray(new Point(-30, -50, 0), new Vector(0, 1, 0)) // standing on the floor
+        );
+        cylinder1.setEmission(new Color(50, 100, 150)); // blueish
+        cylinder1.setMaterial(cylinderMaterial);
+
+// Cylinder 2
+        Cylinder cylinder2 = new Cylinder(
+                6,  // smaller radius
+                40, // shorter height
+                new Ray(new Point(30, -50, 40), new Vector(0, 1, 0)) // standing on the floor, offset in Z
+        );
+        cylinder2.setEmission(new Color(80, 80, 120)); // purple-blue
+        cylinder2.setMaterial(cylinderMaterial);
+
+// Add to scene
+        scene.geometries.add(cylinder1, cylinder2);
 
         // Add ambient light with a low intensity for gentle overall illumination
         scene.setAmbientLight(new AmbientLight(new Color(10, 10, 15), 0.15));
@@ -138,23 +145,24 @@ public class AntiAliasingTest {
                 .setVpSize(250, 250)
                 .setResolution(800, 800)
                 //.enableAntiAliasing(64)
-                .enableAntiAliasing(9)
+                // .enableAdaptiveAntiAliasing(64, 5) // depth=3, threshold=15
+                .enableAdaptiveAntiAliasing(4, 3)
                 .build();
 
         camera.renderImage()
-                .writeToImage("colorfulAestheticAntiAliasingSceneImproved0");
+                .writeToImage("colorfulAestheticAntiAliasingSceneImproved2");
     }
 
     /**
      * Adds a "flower" of spheres (one center sphere and 8 surrounding spheres) to the scene.
      *
-     * @param scene     The scene to add the spheres to.
-     * @param centerX   X-coordinate of the flower center.
-     * @param centerY   Y-coordinate of the flower center.
-     * @param centerZ   Z-coordinate of the flower center.
-     * @param radius    Radius of each sphere.
-     * @param distance  Distance from the center to surrounding spheres.
-     * @param colors    Array of colors to use for the spheres.
+     * @param scene    The scene to add the spheres to.
+     * @param centerX  X-coordinate of the flower center.
+     * @param centerY  Y-coordinate of the flower center.
+     * @param centerZ  Z-coordinate of the flower center.
+     * @param radius   Radius of each sphere.
+     * @param distance Distance from the center to surrounding spheres.
+     * @param colors   Array of colors to use for the spheres.
      */
     void addFlowerSpheres(Scene scene, double centerX, double centerY, double centerZ, double radius, double distance, Color[] colors) {
         Material mat = new Material()

@@ -31,6 +31,10 @@ public class Camera implements Cloneable {
     private ImageWriter imageWriter;
     private RayTracerBase rayTracer;
     private int nX = 1, nY = 1; // default resolution
+    private boolean adaptiveAntiAliasing = false;
+    private int maxAdaptiveDepth = 2; // עומק רקורסיה מקסימלי
+    private double adaptiveThreshold = 10.0;
+    private static final double MIN_PIXEL_SIZE = 0.0001;
 
     /**
      * Private constructor to enforce the use of the Builder pattern.
@@ -71,6 +75,13 @@ public class Camera implements Cloneable {
         return new Ray(p0, pIJ.subtract(p0).normalize());
     }
 
+    private Ray constructRayThroughPoint(double xShift, double yShift) {
+        Point pIJ = p0.add(vTo.scale(distance));
+        if (!isZero(xShift)) pIJ = pIJ.add(vRight.scale(xShift));
+        if (!isZero(yShift)) pIJ = pIJ.add(vUp.scale(yShift));
+        return new Ray(p0, pIJ.subtract(p0).normalize());
+    }
+
     /**
      * Renders the image.
      *
@@ -85,7 +96,13 @@ public class Camera implements Cloneable {
         for (int i = 0; i < nY; i++) {
             for (int j = 0; j < nX; j++) {
                 Color finalColor = Color.BLACK;
-                if (antiAliasing) {
+                if (adaptiveAntiAliasing) {
+                    double Ry = height / nY;
+                    double Rx = width / nX;
+                    double Yi = -(i - (nY - 1) / 2d) * Ry;
+                    double Xj = (j - (nX - 1) / 2d) * Rx;
+                    finalColor = adaptiveAntiAliasing(nX, nY, j, i, maxAdaptiveDepth, Rx, Ry, Xj, Yi);
+                } else if (antiAliasing) {
                     List<Ray> rays = constructAARays(nX, nY, j, i);
                     for (Ray ray : rays) {
                         finalColor = finalColor.add(rayTracer.traceRay(ray));
@@ -99,6 +116,60 @@ public class Camera implements Cloneable {
             }
         }
         return this;
+    }
+
+    private Color adaptiveAntiAliasing(int nX, int nY, int j, int i, int depth, double pixelWidth, double pixelHeight, double centerX, double centerY) {
+        if (depth == 0 || pixelWidth < MIN_PIXEL_SIZE || pixelHeight < MIN_PIXEL_SIZE) {
+            Ray ray = constructRayThroughPoint(centerX, centerY);
+            return rayTracer.traceRay(ray);
+        }
+
+        double halfWidth = pixelWidth / 2;
+        double halfHeight = pixelHeight / 2;
+
+        // 4 פינות
+        double[][] offsets = {
+                {-halfWidth, -halfHeight},
+                {halfWidth, -halfHeight},
+                {-halfWidth, halfHeight},
+                {halfWidth, halfHeight}
+        };
+
+        Color[] colors = new Color[4];
+        for (int k = 0; k < 4; k++) {
+            double x = centerX + offsets[k][0];
+            double y = centerY + offsets[k][1];
+            Ray ray = constructRayThroughPoint(x, y);
+            colors[k] = rayTracer.traceRay(ray);
+        }
+
+        boolean needSplit = false;
+        for (int m = 0; m < 4 && !needSplit; m++) {
+            for (int n = m + 1; n < 4; n++) {
+                if (colors[m].difference(colors[n]) > adaptiveThreshold) {
+                    needSplit = true;
+                    break;
+                }
+            }
+        }
+
+        if (!needSplit) {
+            return colors[0].add(colors[1]).add(colors[2]).add(colors[3]).scale(0.25);
+        } else {
+            Color totalColor = Color.BLACK;
+            double[][] quarterOffsets = {
+                    {-halfWidth / 2, -halfHeight / 2},
+                    {halfWidth / 2, -halfHeight / 2},
+                    {-halfWidth / 2, halfHeight / 2},
+                    {halfWidth / 2, halfHeight / 2}
+            };
+            for (int k = 0; k < 4; k++) {
+                double x = centerX + quarterOffsets[k][0];
+                double y = centerY + quarterOffsets[k][1];
+                totalColor = totalColor.add(adaptiveAntiAliasing(nX, nY, j, i, depth - 1, halfWidth, halfHeight, x, y));
+            }
+            return totalColor.scale(0.25);
+        }
     }
 
     /**
@@ -238,6 +309,13 @@ public class Camera implements Cloneable {
         public Builder enableAntiAliasing(int samples) {
             camera.antiAliasing = true;
             camera.samples = samples;
+            return this;
+        }
+
+        public Builder enableAdaptiveAntiAliasing(int maxDepth, double threshold) {
+            camera.adaptiveAntiAliasing = true;
+            camera.maxAdaptiveDepth = maxDepth;
+            camera.adaptiveThreshold = threshold;
             return this;
         }
 

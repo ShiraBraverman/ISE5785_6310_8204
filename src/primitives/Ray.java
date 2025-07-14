@@ -107,6 +107,10 @@ public class Ray {
      * @return The point on the ray corresponding to the parameter t.
      */
     public Point getPoint(double t) {
+        if (t == 0 || Math.abs(t) < 1e-6 || Double.isNaN(t) || Double.isInfinite(t)) {
+            Vector scaled = direction.scale(t);
+            return origin.add(scaled);
+        }
         return origin.add(direction.scale(t));
     }
     public Point getHead() {
