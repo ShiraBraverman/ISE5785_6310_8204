@@ -14,6 +14,7 @@ import renderer.RayTracerType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.MissingResourceException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static primitives.Util.alignZero;
 import static primitives.Util.isZero;
@@ -35,6 +36,9 @@ public class Camera implements Cloneable {
     private int maxAdaptiveDepth = 2; // עומק רקורסיה מקסימלי
     private double adaptiveThreshold = 10.0;
     private static final double MIN_PIXEL_SIZE = 0.0001;
+    private boolean multithreading = false;
+    private int threadsCount = Runtime.getRuntime().availableProcessors(); // ברירת מחדל
+
 
     /**
      * Private constructor to enforce the use of the Builder pattern.
@@ -81,6 +85,16 @@ public class Camera implements Cloneable {
         if (!isZero(yShift)) pIJ = pIJ.add(vUp.scale(yShift));
         return new Ray(p0, pIJ.subtract(p0).normalize());
     }
+    public Camera setMultithreading(boolean enabled) {
+        this.multithreading = enabled;
+        return this;
+    }
+
+    public Camera setThreadsCount(int count) {
+        this.threadsCount = count;
+        return this;
+    }
+
 
     /**
      * Renders the image.
@@ -93,6 +107,8 @@ public class Camera implements Cloneable {
         if (rayTracer == null)
             throw new IllegalStateException("rayTracer is not initialized");
 
+        if (multithreading)
+            return renderImageMultiThreaded();
         for (int i = 0; i < nY; i++) {
             for (int j = 0; j < nX; j++) {
                 Color finalColor = Color.BLACK;
@@ -117,6 +133,52 @@ public class Camera implements Cloneable {
         }
         return this;
     }
+    private Camera renderImageMultiThreaded() {
+        final int nX = this.nX;
+        final int nY = this.nY;
+        final AtomicInteger nextRow = new AtomicInteger(0); // אינדקס שורה הבא
+
+        Thread[] threads = new Thread[threadsCount];
+
+        for (int i = 0; i < threads.length; ++i) {
+            threads[i] = new Thread(() -> {
+                int row;
+                while ((row = nextRow.getAndIncrement()) < nY) {
+                    for (int col = 0; col < nX; col++) {
+                        Color finalColor;
+                        if (adaptiveAntiAliasing) {
+                            double Ry = height / nY;
+                            double Rx = width / nX;
+                            double Yi = -(row - (nY - 1) / 2d) * Ry;
+                            double Xj = (col - (nX - 1) / 2d) * Rx;
+                            finalColor = adaptiveAntiAliasing(nX, nY, col, row, maxAdaptiveDepth, Rx, Ry, Xj, Yi);
+                        } else if (antiAliasing) {
+                            List<Ray> rays = constructAARays(nX, nY, col, row);
+                            finalColor = Color.BLACK;
+                            for (Ray ray : rays) {
+                                finalColor = finalColor.add(rayTracer.traceRay(ray));
+                            }
+                            finalColor = finalColor.scale(1.0 / rays.size());
+                        } else {
+                            Ray ray = constructRay(nX, nY, col, row);
+                            finalColor = rayTracer.traceRay(ray);
+                        }
+                        imageWriter.writePixel(col, row, finalColor);
+                    }
+                }
+            });
+        }
+
+        for (Thread thread : threads) thread.start();
+        try {
+            for (Thread thread : threads) thread.join();
+        } catch (InterruptedException e) {
+            throw new RuntimeException("Multithreading interrupted", e);
+        }
+
+        return this;
+    }
+
 
     private Color adaptiveAntiAliasing(int nX, int nY, int j, int i, int depth, double pixelWidth, double pixelHeight, double centerX, double centerY) {
         if (depth == 0 || pixelWidth < MIN_PIXEL_SIZE || pixelHeight < MIN_PIXEL_SIZE) {

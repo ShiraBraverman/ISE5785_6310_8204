@@ -119,9 +119,8 @@ public class Polygon extends Geometry {
       Vector v1 = vertices.get(vertices.size() - 1).subtract(point);
       Vector v2 = vertices.get(0).subtract(point);
 
-      // בדיקה מוקדמת של וקטורים אפסיים
       if (v1.length() == 0 || v2.length() == 0) {
-         return true; // הנקודה על קדקוד
+         return true;
       }
 
       Vector cross;

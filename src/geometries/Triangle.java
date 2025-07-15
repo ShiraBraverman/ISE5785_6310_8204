@@ -32,7 +32,6 @@ public class Triangle extends Polygon {
      */
     @Override
     protected List<Intersectable.Intersection> calculateIntersectionsHelper(Ray ray) {
-        // בדיקה אם הקרן חותכת את המישור של המשולש
         List<Intersectable.Intersection> planeIntersections = plane.calculateIntersectionsHelper(ray);
         if (planeIntersections == null) {
             return null;
